@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
@@ -151,8 +151,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   imageMessage: {
-    width: 120,
-    height: 120,
+    resizeMode: 'cover',
+    maxWidth: 350,
+    maxHeight: 220,
+    width:   Dimensions.get('window').width /2,
+    height: Dimensions.get('window').width /3,
     borderRadius: 10,
   },
   avatarImage: {
@@ -175,6 +178,10 @@ const styles = StyleSheet.create({
   loadingText: {
     marginRight: 13,
   },
+  loadingImage:{
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
+  }
 });
 
 export default styles;

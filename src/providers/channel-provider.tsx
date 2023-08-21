@@ -5,26 +5,29 @@ import {
   updateChannel,
   leaveChannel,
   queryChannelMembers,
+  ChannelRepository,
 } from '@amityco/ts-sdk';
 
 import { getAmityUser } from './user-provider';
 import { uploadFile } from './file-provider';
+import type { UserInterface } from 'src/types/user.interface';
 
 export async function createAmityChannel(
   currentUserID: string,
-  users: Amity.User[]
+  users: UserInterface[]
 ): Promise<Amity.Channel> {
   return await new Promise(async (resolve, reject) => {
     if (users.length < 1) {
       return reject(new Error('Insufficient member count'));
     }
+    console.log('currentUserID:', currentUserID)
     console.log('check user object list ' + JSON.stringify(users));
     let channelType: Amity.ChannelType =
       users.length > 1 ? 'community' : 'conversation';
     let userIds: string[] = [currentUserID];
-    const currentUser = await getAmityUser(currentUserID);
-    let displayName = currentUser.displayName! + '-';
-    displayName += users.map((user) => user.displayName).join('-');
+    const { userObject } = await getAmityUser(currentUserID);
+    let displayName = userObject.data.displayName! + ', ';
+    displayName += users.map((user) => user.displayName).join(', ');
     userIds.push(...users.map((user) => user.userId));
     const param = {
       displayName: displayName,
@@ -32,17 +35,15 @@ export async function createAmityChannel(
       userIds: userIds,
     };
     console.log('check channel param ' + JSON.stringify(param));
-    const queryChannel = createQuery(createChannel, param);
 
-    runQuery(queryChannel, (result) => {
-      if (result.loading == false) {
-        if (result.error == undefined) {
-          return resolve(result.data);
-        } else {
-          return reject(new Error('Unable to create channel ' + result.error));
-        }
-      }
-    });
+
+    const { data: channel,  } = await ChannelRepository.createChannel(param);
+    if(channel){
+      resolve(channel)
+    }else{
+      reject(' Create Channel unsuccessful')
+    }
+    console.log('param:', param)
   });
 }
 
@@ -93,9 +94,9 @@ export async function updateAmityChannel(
       return reject(
         new Error(
           'Display name and image path is missing' +
-            imagePath +
-            ' --- ' +
-            displayName
+          imagePath +
+          ' --- ' +
+          displayName
         )
       );
     }

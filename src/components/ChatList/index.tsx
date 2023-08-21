@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { View, TouchableHighlight, Image } from 'react-native';
 
-import { createQuery, runQuery, queryChannelMembers } from '@amityco/ts-sdk';
+import { ChannelRepository } from '@amityco/ts-sdk';
 import CustomText from '../CustomText';
 import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
@@ -54,17 +54,18 @@ const ChatList: React.FC<IChatListProps> = ({
     chatMemberNumber: number
   ) => {
     console.log('type:' + channelType);
-    const query = createQuery(queryChannelMembers, {
-      channelId: channelId,
-    });
 
-    runQuery(query, ({ data: members }) => {
-      if (chatMemberNumber === 2 && members) {
-        setOneOnOneChatObject(members);
-      } else if (members) {
-        setGroupChatObject(members);
-      }
-    });
+    ChannelRepository.Membership.getMembers(
+      { channelId },
+      ({ data: members }) => {
+        if (chatMemberNumber === 2 && members) {
+          setOneOnOneChatObject(members);
+        } else if (members) {
+          setGroupChatObject(members);
+        }
+      },
+    );
+
   };
 
   useEffect(() => {
