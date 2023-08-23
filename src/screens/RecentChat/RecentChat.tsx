@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 
 import { ChannelRepository, getChannelTopic, subscribeTopic } from '@amityco/ts-sdk';
-import ChatList, { IChatListProps, IGroupChatObject, IUserObject } from '../../components/ChatList/index';
+import ChatList, { IChatListProps, IGroupChatObject } from '../../components/ChatList/index';
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
@@ -29,9 +29,9 @@ export default function RecentChat() {
   const [channelObjects, setChannelObjects] = useState<IChatListProps[]>([]);
   const [loadChannel, setLoadChannel] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState(false)
-  const [selectedUsers, setSelectedUsers] = useState<UserInterface[]>([])
+
   const [isRefresh, setIsRefresh] = useState<boolean>(false)
-  console.log('selectedUserIds:', selectedUsers)
+  // console.log('selectedUserIds:', selectedUsers)
   // const [unSubFunc, setUnSubFunc] = useState<any>();
 
   const flatListRef = useRef(null);
@@ -65,6 +65,7 @@ export default function RecentChat() {
         <CustomText style={styles.titleText}>Chat</CustomText>
         <TouchableOpacity
           onPress={() => {
+            // navigation.navigate('SelectMembers')
             setIsModalVisible(true)
             // navigation.navigate('SelectMembers');
           }}
@@ -151,25 +152,23 @@ export default function RecentChat() {
   }
 
   const handleOnFinish = async (users: UserInterface[]) => {
-
-    setSelectedUsers(users)
     const channel = await createAmityChannel((client as Amity.Client).userId as string, users)
     if (channel) {
       console.log('channelId:', channel)
       try {
         if (users.length === 1 && users[0]) {
-          const oneOnOneChatObject = {
+          const oneOnOneChatObject: UserInterface = {
             userId: users[0].userId,
             displayName: users[0].displayName as string,
             avatarFileId: users[0].avatarFileId as string,
           };
-          // navigation.goBack();
-          // setTimeout(() => {
-          //   navigation.navigate('ChatRoom', {
-          //     channelId: channel.channelId,
-          //     chatReceiver: oneOnOneChatObject,
-          //   });
-          // }, 500);
+          console.log('oneOnOneChatObject:', oneOnOneChatObject)
+               
+            navigation.navigate('ChatRoom', {
+              channelId: channel.channelId,
+              chatReceiver: oneOnOneChatObject,
+            });
+        
         } else if (users.length > 1) {
           const chatDisplayName = users.map(
             (item) => item.displayName
@@ -181,18 +180,20 @@ export default function RecentChat() {
               avatarFileId: item.avatarFileId,
             };
           });
-          const groupChatObject = {
-            chatDisplayName: chatDisplayName.join(','),
+          const groupChatObject: IGroupChatObject = {
+            displayName: chatDisplayName.join(','),
             users: userObject,
+            memberCount: channel.memberCount as number,
+            avatarFileId: channel.avatarFileId
           };
           console.log('groupChatObject: ', groupChatObject);
-          // navigation.goBack();
-          // setTimeout(() => {
-          //   navigation.navigate('ChatRoom', {
-          //     channelId: channel.channelId,
-          //     chatReceiver: groupChatObject,
-          //   });
-          // }, 500);
+        
+
+          navigation.navigate('ChatRoom', {
+            channelId: channel.channelId,
+            groupChat: groupChatObject,
+          });
+      
         }
   
         console.log('create chat success ' + JSON.stringify( channel));

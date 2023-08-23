@@ -181,6 +181,20 @@ const styles = StyleSheet.create({
   loadingImage:{
     flexDirection: 'row',
     justifyContent: 'flex-end'
+  },
+  bubbleDivider:{
+    borderBottomColor: '#EBECEF',
+    borderBottomWidth: 1,
+    borderRadius: 20,
+  },
+  textDivider:{
+    backgroundColor: '#EBECEF',
+    borderRadius: 50,
+    alignSelf: 'center',
+    paddingHorizontal: 12,
+    paddingVertical:3,
+    marginBottom: 6,
+
   }
 });
 

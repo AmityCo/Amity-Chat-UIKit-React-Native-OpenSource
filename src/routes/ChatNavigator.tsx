@@ -65,7 +65,9 @@ export default function ChatNavigator() {
             name="SelectMembers"
             component={SelectMembers}
             options={({ }) => ({
-              title: 'Select member',
+              title: '',
+              headerShown: false
+            
             })}
           />
         </Stack.Group>

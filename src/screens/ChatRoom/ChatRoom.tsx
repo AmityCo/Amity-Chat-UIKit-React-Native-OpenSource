@@ -21,7 +21,6 @@ import type { RootStackParamList } from '../../routes/RouteParamList';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BackButton from '../../components/BackButton';
-
 import moment from 'moment';
 import {
   FileRepository,
@@ -77,6 +76,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const { chatReceiver, groupChat, channelId } = route.params;
+  console.log('groupChat:', groupChat)
   const { client } = useAuth();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [messagesData, setMessagesData] =
@@ -338,80 +338,113 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     setFullImage(fullSizeImage);
     setIsVisibleFullImage(true);
   };
+  const renderTimeDivider = (date: Date) => {
+    const currentDate = date;
+    const formattedDate = moment(currentDate).format('MMMM DD, YYYY');
+    const today = moment().startOf('day');
 
-  const renderChatMessages = (message: IMessage) => {
+    let displayText = formattedDate;
+
+    if (moment(currentDate).isSame(today, 'day')) {
+      displayText = 'Today';
+    }
+
+    return (
+      <View style={styles.bubbleDivider}>
+        <View style={styles.textDivider}>
+          <Text >
+            {displayText}
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderChatMessages = (message: IMessage, index: number) => {
     // console.log('message: ', message);
     const isUserChat: boolean =
       message?.user?._id === (client as Amity.Client).userId;
-
+    let isRenderDivider = false
+    const messageDate = moment(message.createdAt)
+    console.log('messageDate:', messageDate)
+    const previousMessageDate = moment(sortedMessages[index + 1]?.createdAt)
+    const isSameDay = messageDate.isSame(previousMessageDate, 'day');
+    console.log('isSameDay:', isSameDay)
+    console.log('previousMessageDate:', previousMessageDate)
+    if (!isSameDay || index === sortedMessages.length-1) {
+      isRenderDivider = true
+    }
     return (
-      <View
-        style={!isUserChat ? styles.leftMessageWrap : styles.rightMessageWrap}
-      >
-        {!isUserChat && (
-          <Image
-            source={
-              message.user.avatar
-                ? { uri: message.user.avatar }
-                : require('../../../assets/icon/Placeholder.png')
-            }
-            style={styles.avatarImage}
-          />
-        )}
-
-        <View>
+      <View>
+        {isRenderDivider && renderTimeDivider(message.createdAt as Date)}
+        <View
+          style={!isUserChat ? styles.leftMessageWrap : styles.rightMessageWrap}
+        >
           {!isUserChat && (
-            <Text
-              style={isUserChat ? styles.chatUserText : styles.chatFriendText}
-            >
-              {message.user.name}
-            </Text>
+            <Image
+              source={
+                message.user.avatar
+                  ? { uri: message.user.avatar }
+                  : require('../../../assets/icon/Placeholder.png')
+              }
+              style={styles.avatarImage}
+            />
           )}
 
-          {message.messageType === 'text' ? (
-            <View
-              key={message._id}
-              style={[
-                styles.textChatBubble,
-                isUserChat ? styles.userBubble : styles.friendBubble,
-              ]}
-            >
+          <View>
+            {!isUserChat && (
               <Text
                 style={isUserChat ? styles.chatUserText : styles.chatFriendText}
               >
-                {message.text}
+                {message.user.name}
               </Text>
-            </View>
-          ) : (
-            <TouchableOpacity
+            )}
+
+            {message.messageType === 'text' ? (
+              <View
+                key={message._id}
+                style={[
+                  styles.textChatBubble,
+                  isUserChat ? styles.userBubble : styles.friendBubble,
+                ]}
+              >
+                <Text
+                  style={isUserChat ? styles.chatUserText : styles.chatFriendText}
+                >
+                  {message.text}
+                </Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                style={[
+                  styles.imageChatBubble,
+                  isUserChat ? styles.userImageBubble : styles.friendBubble,
+                ]}
+                onPress={() => openFullImage(message.image as string)}
+              >
+
+                <Image
+                  style={styles.imageMessage}
+                  source={{
+                    uri: message.image + '?size=medium',
+                  }}
+                />
+              </TouchableOpacity>
+            )}
+
+            <Text
               style={[
-                styles.imageChatBubble,
-                isUserChat ? styles.userImageBubble : styles.friendBubble,
+                styles.chatTimestamp,
+                {
+                  alignSelf: isUserChat ? 'flex-end' : 'flex-start',
+                },
               ]}
-              onPress={() => openFullImage(message.image as string)}
             >
-
-              <Image
-                style={styles.imageMessage}
-                source={{
-                  uri: message.image + '?size=medium',
-                }}
-              />
-            </TouchableOpacity>
-          )}
-
-          <Text
-            style={[
-              styles.chatTimestamp,
-              {
-                alignSelf: isUserChat ? 'flex-end' : 'flex-start',
-              },
-            ]}
-          >
-            {moment(message.createdAt).format('hh:mm A')}
-          </Text>
+              {moment(message.createdAt).format('hh:mm A')}
+            </Text>
 
 
+          </View>
         </View>
       </View>
     );
@@ -454,11 +487,11 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
         result.assets[0] !== null &&
         result.assets[0]
       ) {
-      const selectedImages = result.assets;
-      const imageUriArr: string[] = selectedImages.map((item) => item.uri);
-      const imagesArr = [...imageMultipleUri];
-      const totalImages = imagesArr.concat(imageUriArr);
-      setImageMultipleUri(totalImages);
+        const selectedImages = result.assets;
+        const imageUriArr: string[] = selectedImages.map((item) => item.uri);
+        const imagesArr = [...imageMultipleUri];
+        const totalImages = imagesArr.concat(imageUriArr);
+        setImageMultipleUri(totalImages);
         // do something with uri
       }
     }
@@ -467,7 +500,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
 
   const createImageMessage = async (fileId: string) => {
-  	console.log('createImageMessage: trigger')
+    console.log('createImageMessage: trigger')
 
     if (fileId) {
 
@@ -476,7 +509,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
         dataType: MessageContentType.IMAGE,
         fileId: fileId,
       };
-     await MessageRepository.createMessage(imageMessage);
+      await MessageRepository.createMessage(imageMessage);
 
 
     }
@@ -565,14 +598,6 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   };
   // const allMessages = [...loadingImages, ...sortedMessages];
   // console.log('allMessages: ', allMessages);
-  const handleRefresh = () => {
-    // Perform some logic to refresh the data
-    const loadingMessages: IMessage[] = loadingImages.concat(messages);
-    console.log('loadingMessages: ', loadingMessages);
-    console.log('====render====');
-    setMessages(loadingMessages);
-    setLoadingImages([]);
-  };
 
 
   return (
@@ -581,13 +606,12 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
       <View style={styles.chatContainer}>
         <FlatList
           data={sortedMessages}
-          renderItem={({ item }) => renderChatMessages(item)}
+          renderItem={({ item, index }) => renderChatMessages(item, index)}
           keyExtractor={(item) => item._id}
           onEndReached={loadNextMessages}
           onEndReachedThreshold={0.5}
           inverted
           ref={flatListRef}
-          refreshing={false}
           // onRefresh={handleRefresh}
           ListHeaderComponent={() =>
             <View style={styles.loadingImage}>

@@ -11,6 +11,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
+import type { UserInterface } from '../../types/user.interface';
 
 export interface IChatListProps {
   chatId: string;
@@ -21,15 +22,11 @@ export interface IChatListProps {
   channelType: 'conversation' | 'broadcast' | 'live' | 'community' | '';
   avatarFileId: string | undefined;
 }
-export interface IUserObject {
-  userId: string;
-  displayName: string;
-  avatarFileId: string;
-}
+
 export interface IGroupChatObject {
   displayName: string;
   memberCount: number;
-  users: IUserObject[];
+  users: UserInterface[];
   avatarFileId: string | undefined;
 }
 const ChatList: React.FC<IChatListProps> = ({
@@ -73,7 +70,7 @@ const ChatList: React.FC<IChatListProps> = ({
       const targetIndex: number = oneOnOneChatObject?.findIndex(
         (item) => item.userId !== (client as Amity.Client).userId
       );
-      const chatReceiver: IUserObject = {
+      const chatReceiver: UserInterface = {
         userId: oneOnOneChatObject[targetIndex]?.userId as string,
         displayName: oneOnOneChatObject[targetIndex]?.user
           ?.displayName as string,
@@ -91,7 +88,7 @@ const ChatList: React.FC<IChatListProps> = ({
 
   useEffect(() => {
     if (groupChatObject) {
-      const userArr: IUserObject[] = groupChatObject?.map((item) => {
+      const userArr: UserInterface[] = groupChatObject?.map((item) => {
         return {
           userId: item.userId as string,
           displayName: item.user?.displayName as string,

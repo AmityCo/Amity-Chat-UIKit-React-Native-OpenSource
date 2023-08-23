@@ -1,4 +1,5 @@
-import type { IGroupChatObject, IUserObject } from '../components/ChatList';
+import type { UserInterface } from '../types/user.interface';
+import type { IGroupChatObject } from '../components/ChatList';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -6,7 +7,7 @@ export type RootStackParamList = {
   Second: undefined;
   ChatRoom: {
     channelId: string;
-    chatReceiver?: IUserObject;
+    chatReceiver?: UserInterface;
     groupChat?: IGroupChatObject;
   };
   RecentChat: undefined;

@@ -1,231 +1,257 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-shadow */
-import React, { useEffect, useRef, useState } from 'react';
-// import { useTranslation } from 'react-i18next';
+import { UserRepository } from '@amityco/ts-sdk';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ListRenderItem,
-  NativeScrollEvent,
-  SectionList,
+  TouchableOpacity,
   View,
+  Text,
+  Modal,
+  SectionList,
+  NativeScrollEvent,
+  ListRenderItemInfo,
+  TextInput,
+  FlatList,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import useAuth from '../../hooks/useAuth';
-import SearchBar from '../../components/SearchBar/index';
+import { SvgXml } from 'react-native-svg';
 import { styles } from './styles';
-import SectionHeader from '../../components/ListSectionHeader/index';
-import UserItem from '../../components/UserItem/index';
-import type { UserGroup } from '../../types/user.interface';
-import { groupUsers, queryUser } from '../../providers/user-provider';
-import SelectedUserHorizontal from '../../components/SelectedUserHorizontal/index';
-import DoneButton from '../../components/DoneButton';
-import { createAmityChannel } from '../../providers/channel-provider';
-import CloseButton from '../../components/CloseButton/index';
-import type { queryUsers } from '@amityco/ts-sdk';
-import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { circleCloseIcon, closeIcon, searchIcon } from '../../svg/svg-xml-list';
+import type { UserInterface } from '../../types/user.interface';
+
+import SectionHeader from '../../components/ListSectionHeader';
+import SelectedUserHorizontal from '../../components/SelectedUserHorizontal';
+import UserItem from '../../components/UserItem';
+interface IModal {
+  visible: boolean;
+  userId?: string;
+  initUserList?: UserInterface[];
+  onClose?: () => void;
+  onFinish?: (users: UserInterface[]) => void;
+}
+export type SelectUserList = {
+  title: string;
+  data: UserInterface[];
+};
 
 export default function SelectMembers({ navigation }: any) {
-  // const { t, i18n } = useTranslation();
-  const { client } = useAuth();
-  const [showLoadingIndicator, setShowLoadingIndicator] = useState(true);
-  const [sectionedUserList, setSectionedUserList] = useState<UserGroup[]>([]);
-  const [selectedUserList, setSelectedUserList] = useState<Amity.User[]>([]);
-  console.log('selectedUserList: ', selectedUserList);
-  const [isScrollEnd, setIsScrollEnd] = useState(false);
-  const [userListOptions, setUserListOptions] =
-    useState<Amity.RunQueryOptions<typeof queryUsers>>();
-  const { loading, nextPage } = userListOptions ?? {};
-  const selectedUserListRef = useRef(selectedUserList);
-  const userList = useRef<Amity.User[]>([]);
-  const searchText = useRef<string>();
-  const searchUserList = useRef<Amity.User[]>([]);
-  let isPaginate = false;
-  const loadUserList = async (
-    nextPage?: Amity.Page<number> | undefined,
-    displayName?: string
-  ) => {
-    try {
-      const result = await queryUser(setUserListOptions, nextPage, displayName);
-      let sectionedList: UserGroup[] = [];
-      if (displayName != undefined && displayName != '') {
-        searchUserList.current = [];
-        searchUserList.current = result;
-        sectionedList = groupUsers(searchUserList.current);
-      } else {
-        if (isPaginate || userList.current.length == 0) {
-          userList.current = userList.current.concat(result);
-        }
-        sectionedList = groupUsers(userList.current);
+  const [sectionedGroupUserList, setSectionedGroupUserList] = useState<SelectUserList[]>([]);
+  // console.log('sectionedGroupUserList:', sectionedGroupUserList)
+  const [sectionedUserList, setSectionedUserList] = useState<UserInterface[]>([]);
+  console.log('sectionedUserList:', sectionedUserList)
+  const [selectedUserList, setSelectedUserList] = useState<UserInterface[]>([]);
+  // console.log('selectedUserList:', selectedUserList)
+  // const [isScrollEnd, setIsScrollEnd] = useState(false);
+  const [usersObject, setUsersObject] = useState<Amity.LiveCollection<Amity.User>>();
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const { data: userArr = [], onNextPage } = usersObject ?? {};
+  // console.log('userArr:', userArr)
+
+
+
+  //   useEffect(() => {
+  //  setSelectedUserList(initUserList)
+  //   }, [initUserList])
+
+  const queryAccounts = (text: string = '') => {
+
+    UserRepository.getUsers(
+      { displayName: text, limit: 5 },
+      (data) => {
+        setSectionedGroupUserList([])
+        setUsersObject(data)
+
       }
-      setSectionedUserList([...sectionedList]);
-      // eslint-disable-next-line no-catch-shadow
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isPaginate = false;
-      setShowLoadingIndicator(false);
-    }
+    );
+
+
+  };
+  const handleChange = (text: string) => {
+    setSearchTerm(text);
   };
   useEffect(() => {
-    loadUserList();
-  }, []);
+    if (searchTerm.length > 2) {
+      queryAccounts(searchTerm);
+    }
+  }, [searchTerm]);
+
+  const clearButton = () => {
+    setSearchTerm('');
+    setSectionedGroupUserList([])
+  };
+
+  const createSectionGroup = () => {
+    // let userListForSection: SelectUserList[] = [...sectionedUserList]
+    // console.log('userListForSection:', userListForSection)
+
+    const sectionUserArr =userArr.map((item) => {
+    return { userId: item.userId, displayName: item.displayName as string, avatarFileId: item.avatarFileId as string }
+    })
+    setSectionedUserList(sectionUserArr)
+    // const groupedData: SelectUserList[] = [];
+
+    // sectionUserArr.forEach((item) => {
+    //   const existingItemIndex = groupedData.findIndex((groupedItem) => groupedItem.title === item.title);
+
+    //   if (existingItemIndex !== -1 && groupedData) {
+    //     // If the title already exists in the groupedData array, merge the data arrays
+    //     (groupedData[existingItemIndex] as Record<string, any>).data.push(...item.data);
+    //   } else {
+    //     // If the title does not exist, add the entire item to the groupedData array
+    //     groupedData.push(item);
+    //   }
+    // });
+    // setSectionedGroupUserList(groupedData)
+  }
+
   useEffect(() => {
-    if (isScrollEnd) {
-      isPaginate = true;
-      handleLoadMore();
+    createSectionGroup()
+  }, [userArr])
+
+  useEffect(() => {
+    if (searchTerm.length === 0) {
+      queryAccounts()
     }
-  }, [isScrollEnd]);
 
-  React.useLayoutEffect(() => {
-    // Set the headerRight component to a TouchableOpacity
-    navigation.setOptions({
-      headerLeft: () => <CloseButton navigation={navigation} />,
-      // eslint-disable-next-line react/no-unstable-nested-components
-      headerRight: () => (
-        <DoneButton navigation={navigation} onDonePressed={onDonePressed} />
-      ),
-    });
-  }, [navigation]);
+  }, [searchTerm])
 
-  const handleLoadMore = () => {
-    if (!loading) {
-      loadUserList(nextPage);
-    }
-  };
-  const handleScroll = ({
-    nativeEvent,
-  }: {
-    nativeEvent: NativeScrollEvent;
-  }) => {
-    const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
-    const isEnd =
-      layoutMeasurement.height + contentOffset.y >= contentSize.height;
+  // useEffect(() => {
+  //   const jsonData: SelectUserList[] = [
+  //     ...sectionedUserList
+  //   ];
 
-    setIsScrollEnd(isEnd);
-  };
-  const renderSectionHeader = ({ section }: { section: UserGroup }) => (
+  //   const groupedData: SelectUserList[] = [];
+
+  //   jsonData.forEach((item) => {
+  //     const existingItemIndex = groupedData.findIndex((groupedItem) => groupedItem.title === item.title);
+
+  //     if (existingItemIndex !== -1 && groupedData) {
+  //       // If the title already exists in the groupedData array, merge the data arrays
+  //       (groupedData[existingItemIndex] as Record<string, any>).data.push(...item.data);
+  //     } else {
+  //       // If the title does not exist, add the entire item to the groupedData array
+  //       groupedData.push(item);
+  //     }
+  //   });
+  //   setSectionedGroupUserList(groupedData)
+
+  // }, [sectionedUserList])
+
+  const renderSectionHeader = ({ section }: { section: SelectUserList }) => (
     <SectionHeader title={section.title} />
   );
 
-  const handleSearch = (text: string) => {
-    searchText.current = text;
-    setTimeout(() => {
-      loadUserList(undefined, text);
-    }, 500);
-  };
-  const onDeleteUserPressed = (user: Amity.User) => {
-    const index = selectedUserListRef.current.findIndex(
-      (item) => item.displayName === user.displayName
-    );
-    selectedUserList.splice(index, 1);
-    setSelectedUserList([...selectedUserListRef.current]);
-  };
-  const onUserPressed = (user: Amity.User) => {
-    const index = selectedUserListRef.current.findIndex(
-      (item) => item.displayName === user.displayName
-    );
-    if (index !== -1) {
-      // Deselect user
-      selectedUserListRef.current.splice(index, 1);
-      setSelectedUserList([...selectedUserListRef.current]);
+  const onUserPressed = (user: UserInterface) => {
+    console.log('user:', user)
+    const isIncluded = selectedUserList.some(item => item.userId === user.userId)
+    console.log('isIncluded:', isIncluded)
+    if (isIncluded) {
+      const removedUser = selectedUserList.filter(item => item.userId !== user.userId)
+      setSelectedUserList(removedUser)
     } else {
-      // Select user
-      selectedUserListRef.current.push(user);
-      setSelectedUserList([...selectedUserListRef.current]);
+      setSelectedUserList(prev => [...prev, user])
     }
+
   };
 
-  const onDonePressed = async () => {
-    if (selectedUserList.length === 0) {
-      navigation.goBack();
-    }
 
-    try {
-      const result = await createAmityChannel(
-        (client as Amity.Client).userId!,
-        selectedUserListRef.current
-      );
-      if (selectedUserList.length === 1 && selectedUserList[0]) {
-        const oneOnOneChatObject = {
-          userId: selectedUserList[0]._id,
-          displayName: selectedUserList[0].displayName as string,
-          avatarFileId: selectedUserList[0].avatarFileId as string,
-        };
-        navigation.goBack();
-        setTimeout(() => {
-          navigation.navigate('ChatRoom', {
-            channelId: result.channelId,
-            chatReceiver: oneOnOneChatObject,
-          });
-        }, 300);
-      } else if (selectedUserList.length > 1) {
-        const chatDisplayName = selectedUserList.map(
-          (item) => item.displayName
-        );
-        const userObject = selectedUserList.map((item: Amity.User) => {
-          return {
-            userId: item.userId,
-            displayName: item.displayName,
-            avatarFileId: item.avatarFileId,
-          };
-        });
-        const groupChatObject = {
-          chatDisplayName: chatDisplayName.join(','),
-          users: userObject,
-        };
-        console.log('groupChatObject: ', groupChatObject);
-        navigation.goBack();
-        setTimeout(() => {
-          navigation.navigate('ChatRoom', {
-            channelId: result.channelId,
-            chatReceiver: groupChatObject,
-          });
-        }, 300);
-      }
+  const renderItem = ({ item }: ListRenderItemInfo<UserInterface>) => {
 
-      console.log('create chat success ' + JSON.stringify(result));
-    } catch (error) {
-      console.log('create chat error ' + JSON.stringify(error));
-      console.error(error);
-    } finally {
-      setShowLoadingIndicator(false);
-    }
-  };
-
-  const renderItem: ListRenderItem<Amity.User> = ({ item }) => {
-    let isCheckmark = false;
-    const selectedUser = selectedUserList.find(
+    const selectedUser = selectedUserList.some(
       (user) => user.userId === item.userId
     );
-    isCheckmark = selectedUser ? true : false;
+    const userObj: UserInterface = { userId: item.userId, displayName: item.displayName as string, avatarFileId: item.avatarFileId as string }
     return (
-      <UserItem user={item} isCheckmark={isCheckmark} onPress={onUserPressed} />
+      <UserItem showThreeDot={false} user={userObj} isCheckmark={selectedUser} onPress={onUserPressed} />
     );
   };
-  const insets = useSafeAreaInsets();
+
+
+  // const handleScroll = ({
+  //   nativeEvent,
+  // }: {
+  //   nativeEvent: NativeScrollEvent;
+  // }) => {
+  //   const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
+  //   const isEnd =
+  //     layoutMeasurement.height + contentOffset.y >= contentSize.height;
+  //   console.log('isEnd:', isEnd)
+  //   // setIsScrollEnd(isEnd);
+  // };
+  const memoizedSectionedGroupUserList = useMemo(() => {
+    const groupedData: SelectUserList[] = [...sectionedGroupUserList];
+
+    // ... your existing logic to create the groupedData ...
+
+    return groupedData;
+  }, [sectionedGroupUserList]);
+
+  // const handleOnClose = () => {
+  //   setSelectedUserList(initUserList)
+  //   onClose && onClose();
+
+  // }
+  const handleLoadMore = () => {
+    if (onNextPage) {
+      onNextPage()
+    }
+  }
+
+  const onDeleteUserPressed = (user: UserInterface) => {
+    const removedUser = selectedUserList.filter(item => item !== user)
+    setSelectedUserList(removedUser)
+  }
+
+
+  // const onDone = () => {
+  //   onFinish && onFinish(selectedUserList)
+  //   setSelectedUserList([])
+  //   onClose && onClose()
+  // }
+
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom + 60 }]}>
-      <LoadingOverlay
-        isLoading={showLoadingIndicator && sectionedUserList.length <= 0}
-        loadingText="Loading..."
-      />
-      <View>
-        <SearchBar handleSearch={handleSearch} />
-        {selectedUserList.length > 0 ? (
-          <SelectedUserHorizontal
-            users={selectedUserList}
-            onDeleteUserPressed={onDeleteUserPressed}
-          />
-        ) : (
-          <View />
-        )}
-        <SectionList
-          sections={sectionedUserList}
-          renderItem={renderItem}
-          onScroll={handleScroll}
-          renderSectionHeader={renderSectionHeader}
-          // keyExtractor={(item, index) => index}
-        />
+
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity style={styles.closeButton}>
+          <SvgXml xml={closeIcon} width="14" height="14" />
+        </TouchableOpacity>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>Select Member</Text>
+        </View>
+        <TouchableOpacity disabled={selectedUserList.length === 0} >
+          <Text style={[selectedUserList.length > 0 ? styles.doneText : styles.disabledDone]}>Done</Text>
+        </TouchableOpacity>
       </View>
+      <View style={styles.inputWrap}>
+        <TouchableOpacity onPress={() => queryAccounts(searchTerm)}>
+          <SvgXml xml={searchIcon} width="20" height="20" />
+        </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          value={searchTerm}
+          onChangeText={handleChange}
+        />
+        <TouchableOpacity onPress={clearButton}>
+          <SvgXml xml={circleCloseIcon} width="20" height="20" />
+        </TouchableOpacity>
+      </View>
+      {selectedUserList.length > 0 ? (
+        <SelectedUserHorizontal
+          users={selectedUserList}
+          onDeleteUserPressed={onDeleteUserPressed}
+        />
+      ) : (
+        <View />
+      )}
+      <FlatList
+        data={ sectionedUserList}
+        renderItem={renderItem}
+        // renderSectionHeader={renderSectionHeader}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        keyExtractor={(item) => item.userId}
+
+      />
     </View>
+
   );
 }

@@ -1,5 +1,5 @@
 import { UserRepository } from '@amityco/ts-sdk';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   TouchableOpacity,
   View,
@@ -9,6 +9,8 @@ import {
   NativeScrollEvent,
   ListRenderItemInfo,
   TextInput,
+  FlatList,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { styles } from './styles';
@@ -29,19 +31,21 @@ export type SelectUserList = {
   data: UserInterface[];
 };
 const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IModal) => {
-  const [sectionedUserList, setSectionedUserList] = useState<SelectUserList[]>([]);
-  console.log('sectionedUserList:', sectionedUserList)
+
+  // console.log('sectionedUserList:', sectionedUserList)
+  const [sectionedUserList, setSectionedUserList] = useState<UserInterface[]>(initUserList);
   const [sectionedGroupUserList, setSectionedGroupUserList] = useState<SelectUserList[]>([]);
-  console.log('sectionedGroupUserList:', sectionedGroupUserList)
+  // console.log('sectionedGroupUserList:', sectionedGroupUserList)
+  // console.log('sectionedGroupUserList:', sectionedGroupUserList)
   // console.log('sectionedUserList:', sectionedUserList)
   const [selectedUserList, setSelectedUserList] = useState<UserInterface[]>(initUserList);
   // console.log('selectedUserList:', selectedUserList)
   // const [isScrollEnd, setIsScrollEnd] = useState(false);
   const [usersObject, setUsersObject] = useState<Amity.LiveCollection<Amity.User>>();
   const [searchTerm, setSearchTerm] = useState('');
-
+const [isShowSectionHeader, setIsShowSectionHeader] = useState<boolean>(false)
   const { data: userArr = [], onNextPage } = usersObject ?? {};
-  console.log('userArr:', userArr)
+  // console.log('userArr:', userArr)
 
 
 
@@ -51,10 +55,9 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
 
   const queryAccounts = (text: string = '') => {
 
-      UserRepository.getUsers(
-      { displayName: text, limit: 10},
+    UserRepository.getUsers(
+      { displayName: text, limit: 20 },
       (data) => {
-        setSectionedUserList([])
         setSectionedGroupUserList([])
         setUsersObject(data)
 
@@ -74,7 +77,6 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
 
   const clearButton = () => {
     setSearchTerm('');
-    setSectionedUserList([])
     setSectionedGroupUserList([])
   };
 
@@ -82,15 +84,30 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
     // let userListForSection: SelectUserList[] = [...sectionedUserList]
     // console.log('userListForSection:', userListForSection)
 
-    const sectionUserArr =userArr.map((item) => {
+    const sectionUserArr = userArr.map((item) => {
       const firstChar = (item.displayName as string).charAt(0).toUpperCase();
       const isAlphabet = /^[A-Z]$/i.test(firstChar);
       const currentLetter = isAlphabet ? (item.displayName as string).charAt(0).toUpperCase() : '#'
-      return  { title: currentLetter as string, data: [{ userId: item.userId, displayName: item.displayName as string, avatarFileId: item.avatarFileId as string }] }
+      return { userId: item.userId, displayName: item.displayName as string, avatarFileId: item.avatarFileId as string }
 
     })
     setSectionedUserList(sectionUserArr)
+    // const groupedData: SelectUserList[] = [];
+
+    // sectionUserArr.forEach((item) => {
+    //   const existingItemIndex = groupedData.findIndex((groupedItem) => groupedItem.title === item.title);
+
+    //   if (existingItemIndex !== -1 && groupedData) {
+    //     // If the title already exists in the groupedData array, merge the data arrays
+    //     (groupedData[existingItemIndex] as Record<string, any>).data.push(...item.data);
+    //   } else {
+    //     // If the title does not exist, add the entire item to the groupedData array
+    //     groupedData.push(item);
+    //   }
+    // });
+    // setSectionedGroupUserList(groupedData)
   }
+
   useEffect(() => {
     createSectionGroup()
   }, [userArr])
@@ -102,30 +119,30 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
 
   }, [visible, searchTerm])
 
-  useEffect(() => {
-    const jsonData: SelectUserList[] = [
-      ...sectionedUserList
-    ];
+  // useEffect(() => {
+  //   const jsonData: SelectUserList[] = [
+  //     ...sectionedUserList
+  //   ];
 
-    const groupedData: SelectUserList[] = [];
+  //   const groupedData: SelectUserList[] = [];
 
-    jsonData.forEach((item) => {
-      const existingItemIndex = groupedData.findIndex((groupedItem) => groupedItem.title === item.title);
+  //   jsonData.forEach((item) => {
+  //     const existingItemIndex = groupedData.findIndex((groupedItem) => groupedItem.title === item.title);
 
-      if (existingItemIndex !== -1 && groupedData) {
-        // If the title already exists in the groupedData array, merge the data arrays
-        (groupedData[existingItemIndex] as Record<string, any>).data.push(...item.data);
-      } else {
-        // If the title does not exist, add the entire item to the groupedData array
-        groupedData.push(item);
-      }
-    });
-    setSectionedGroupUserList(groupedData)
+  //     if (existingItemIndex !== -1 && groupedData) {
+  //       // If the title already exists in the groupedData array, merge the data arrays
+  //       (groupedData[existingItemIndex] as Record<string, any>).data.push(...item.data);
+  //     } else {
+  //       // If the title does not exist, add the entire item to the groupedData array
+  //       groupedData.push(item);
+  //     }
+  //   });
+  //   setSectionedGroupUserList(groupedData)
 
-  }, [sectionedUserList])
+  // }, [sectionedUserList])
 
-  const renderSectionHeader = ({ section }: { section: SelectUserList }) => (
-    <SectionHeader title={section.title} />
+  const renderSectionHeader = () => (
+    <SectionHeader title={''} />
   );
 
   const onUserPressed = (user: UserInterface) => {
@@ -142,26 +159,53 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
   };
 
 
-  const renderItem = ({ item }: ListRenderItemInfo<UserInterface>) => {
-
+  const renderItem = ({ item, index }: ListRenderItemInfo<UserInterface>) => {
+    let isrenderheader = true;
+    const isAlphabet = /^[A-Z]$/i.test(item.displayName[0] as string);
+    const currentLetter = isAlphabet ? (item.displayName as string).charAt(0).toUpperCase() : '#'
     const selectedUser = selectedUserList.some(
       (user) => user.userId === item.userId
     );
     const userObj: UserInterface = { userId: item.userId, displayName: item.displayName as string, avatarFileId: item.avatarFileId as string }
+
+    if (index > 0 && sectionedUserList.length > 0) {
+
+      const isPreviousletterAlphabet = /^[A-Z]$/i.test(((sectionedUserList[index - 1]) as any).displayName[0]);
+      const previousLetter = isPreviousletterAlphabet ? ((sectionedUserList[index - 1]) as any).displayName.charAt(0).toUpperCase() : '#'
+      if (currentLetter === previousLetter) {
+        isrenderheader = false
+      } else {
+        isrenderheader = true
+      }
+
+    }
+
+
+
     return (
-      <UserItem showThreeDot={false} user={userObj} isCheckmark={selectedUser} onPress={onUserPressed} />
+      <View>
+        {isrenderheader && <SectionHeader title={currentLetter} />}
+
+        <UserItem showThreeDot={false} user={userObj} isCheckmark={selectedUser} onPress={onUserPressed} />
+      </View>
+
     );
   };
-  const handleScroll = ({
-    nativeEvent,
-  }: {
-    nativeEvent: NativeScrollEvent;
-  }) => {
-    const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
-    const isEnd =
-      layoutMeasurement.height + contentOffset.y >= contentSize.height;
-    console.log('isEnd:', isEnd)
-    // setIsScrollEnd(isEnd);
+
+
+
+  const flatListRef = useRef(null);
+
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const yOffset = event.nativeEvent.contentOffset.y;
+
+    if (yOffset >= 40) {
+      setIsShowSectionHeader(true)
+      // The FlatList is approximately 200 pixels away from the top
+      console.log('Scrolled 200 pixels from top');
+    }else{
+      setIsShowSectionHeader(false)
+    }
   };
   const handleOnClose = () => {
     setSelectedUserList(initUserList)
@@ -182,6 +226,7 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
 
   const onDone = () => {
     onFinish && onFinish(selectedUserList)
+    setSelectedUserList([])
     onClose && onClose()
   }
 
@@ -220,15 +265,17 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
         ) : (
           <View />
         )}
-        <SectionList
-          sections={sectionedGroupUserList}
+        <FlatList
+          data={sectionedUserList}
           renderItem={renderItem}
-          onScroll={handleScroll}
-          renderSectionHeader={renderSectionHeader}
+          // renderSectionHeader={renderSectionHeader}
           onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.3}
+          onEndReachedThreshold={0.5}
           keyExtractor={(item) => item.userId}
-
+          ListHeaderComponent={isShowSectionHeader?renderSectionHeader:<View/>}
+          stickyHeaderIndices={[0]}
+          ref={flatListRef}
+          onScroll={handleScroll}
         />
       </View>
     </Modal>
