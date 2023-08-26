@@ -80,6 +80,7 @@ export default function RecentChat() {
     headerTitle: '',
   });
 
+
   const onQueryChannel = () => {
     setIsRefresh(true)
     const unsubscribe = ChannelRepository.getChannels(
@@ -105,6 +106,11 @@ export default function RecentChat() {
       disposers.forEach(fn => fn());
     };
   }, [isConnected]);
+const handleRefresh=()=>{
+  disposers.forEach(fn => fn());
+  onQueryChannel()
+}
+
   console.log('isConnected:', isConnected)
 
   useEffect(() => {
@@ -219,8 +225,8 @@ export default function RecentChat() {
           onEndReachedThreshold={0.3}
           ref={flatListRef}
           contentContainerStyle={{ flexGrow: 1 }}
-          onRefresh={onQueryChannel}
-          refreshing={isRefresh}
+          // onRefresh={handleRefresh}
+          // refreshing={isRefresh}
         />
       </View>
     );
@@ -250,7 +256,7 @@ export default function RecentChat() {
   };
 
   return (
-    <View>
+    <View style={styles.chatContainer}>
       {renderTabView()}
       {renderRecentChat}
       <AddMembersModal onFinish={handleOnFinish} onClose={handleCloseModal} visible={isModalVisible} />

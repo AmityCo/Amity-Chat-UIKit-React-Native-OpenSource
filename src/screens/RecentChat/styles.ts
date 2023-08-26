@@ -60,6 +60,9 @@ const styles = StyleSheet.create({
   iosWrap: {
     marginTop: 30,
   },
+  chatContainer:{
+    paddingBottom: 125
+  }
 });
 
 export default styles;
