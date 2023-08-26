@@ -12,6 +12,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import type { UserInterface } from '../../types/user.interface';
+import { SvgXml } from 'react-native-svg';
+import { communityChatIcon, privateChatIcon } from '../../svg/svg-xml-list';
 
 export interface IChatListProps {
   chatId: string;
@@ -119,12 +121,18 @@ const ChatList: React.FC<IChatListProps> = ({
     >
       <View style={styles.chatCard}>
         <View style={styles.avatarSection}>
-          <View style={styles.icon}>
-            <Image
-              style={styles.avatar}
-              source={require('../../../assets/icon/Placeholder.png')}
-            />
-          </View>
+          {avatarFileId ? <Image
+            style={styles.icon}
+            source={
+              {
+                uri: `https://api.amity.co/api/v3/files/${avatarFileId}/download?size=small`,
+              }
+            }
+          /> : <View style={styles.icon}>
+            {channelType === 'community' ? <SvgXml xml={communityChatIcon} width={24} height={24} /> : <SvgXml xml={privateChatIcon} width={24} height={24} />}
+
+          </View>}
+
         </View>
 
         <View style={styles.chatDetailSection}>
