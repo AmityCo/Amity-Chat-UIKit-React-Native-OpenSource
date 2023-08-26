@@ -23,7 +23,6 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import BackButton from '../../components/BackButton';
 import moment from 'moment';
 import {
-  FileRepository,
   MessageContentType,
   MessageRepository,
   SubChannelRepository,
@@ -31,19 +30,8 @@ import {
   subscribeTopic,
 } from '@amityco/ts-sdk';
 import useAuth from '../../hooks/useAuth';
-import {
-  CameraOptions,
-  ImageLibraryOptions,
-  ImagePickerResponse,
-  launchCamera,
-  launchImageLibrary,
-} from 'react-native-image-picker';
 import * as ImagePicker from 'expo-image-picker';
-import Constants from 'expo-constants';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import type { Action } from '../EditChatDetail/EditChatRoomDetail';
-import { uploadFile } from '../../providers/file-provider';
-import LoadingIndicator from '../../components/LoadingIndicator';
 import LoadingImage from '../../components/LoadingImage';
 type ChatRoomScreenComponentType = React.FC<{
   route: RouteProp<RootStackParamList, 'ChatRoom'>;
@@ -76,14 +64,11 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const { chatReceiver, groupChat, channelId } = route.params;
-  console.log('groupChat:', groupChat)
+  // console.log('groupChat:', groupChat)
   const { client } = useAuth();
   const [messages, setMessages] = useState<IMessage[]>([]);
-  const [messagesData, setMessagesData] =
-    useState<Amity.LiveCollection<Amity.Message>>();
+  const [messagesData, setMessagesData] = useState<Amity.LiveCollection<Amity.Message>>();
   const [imageMultipleUri, setImageMultipleUri] = useState<string[]>([]);
-  console.log('imageMultipleUri:', imageMultipleUri)
-  // const [isMessagesLoading, setIsMessagesLoading] = useState(false);
 
   const {
     data: messagesArr = [],
@@ -91,50 +76,18 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     hasNextPage,
   } = messagesData ?? {};
 
-  // console.log('messagesArr:', messagesArr)
-
   const [inputMessage, setInputMessage] = useState('');
-  // const [loadingImages, setLoadingImages] = useState<string[]>([]);
-
   const [sortedMessages, setSortedMessages] = useState<IMessage[]>([]);
-  console.log('sortedMessages: ', sortedMessages);
   const flatListRef = useRef(null);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [imageUri, setImageUri] = useState<string | undefined>();
   const [visibleFullImage, setIsVisibleFullImage] = useState<boolean>(false);
   const [fullImage, setFullImage] = useState<string>('');
-  const imageUriRef = useRef(imageUri);
-  const [loadingImages, setLoadingImages] = useState<IMessage[]>([]);
-  console.log('loadingImages: ', loadingImages);
   const [subChannelData, setSubChannelData] = useState<Amity.SubChannel>();
   const [displayImages, setDisplayImages] = useState<IDisplayImage[]>([]);
-  console.log('displayImages:', displayImages)
-  // console.log('loadingImages: ', loadingImages);
   const disposers: Amity.Unsubscriber[] = [];
-  // console.log('disposers: ', disposers);
 
-  const actions: Action[] = [
-    {
-      title: 'Take Image',
-      type: 'capture',
-      options: {
-        saveToPhotos: true,
-        mediaType: 'photo',
-        includeBase64: false,
-      },
-    },
-    {
-      title: 'Select Image',
-      type: 'library',
-      options: {
-        selectionLimit: 1,
-        mediaType: 'photo',
-        includeBase64: false,
-      },
-    },
-  ];
+
   navigation.setOptions({
-    // eslint-disable-next-line react/no-unstable-nested-components
     header: () => (
       <SafeAreaView edges={['top']}>
         <View style={styles.topBar}>
@@ -215,14 +168,13 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   }, [channelId]);
 
   const startRead = async () => {
-    const res = await SubChannelRepository.startReading(channelId);
-    console.log('res start read:', res)
+    await SubChannelRepository.startReading(channelId);
+
   };
 
   useEffect(() => {
     if (subChannelData && channelId) {
       startRead()
-      console.log('subChannelData before pass: ', subChannelData);
       const unsubscribe = MessageRepository.getMessages(
         { subChannelId: channelId, limit: 10 },
         (value) => {
@@ -312,8 +264,6 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   };
 
   function handleBack(): void {
-    console.log('handleBack: ', handleBack);
-    console.log('disposers: ', disposers);
     disposers.forEach((fn) => fn());
   }
 
@@ -324,11 +274,9 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   };
 
   useEffect(() => {
-    // console.log('messages: ', messages);
     const sortedMessagesData: IMessage[] = messages.sort((x, y) => {
       return new Date(x.createdAt) < new Date(y.createdAt) ? 1 : -1;
     });
-    // console.log('sortedMessagesData: ', sortedMessagesData);
     const reOrderArr = sortedMessagesData;
     setSortedMessages([...reOrderArr]);
   }, [messages]);
@@ -371,7 +319,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     const isSameDay = messageDate.isSame(previousMessageDate, 'day');
     console.log('isSameDay:', isSameDay)
     console.log('previousMessageDate:', previousMessageDate)
-    if (!isSameDay || index === sortedMessages.length-1) {
+    if (!isSameDay || index === sortedMessages.length - 1) {
       isRenderDivider = true
     }
     return (
@@ -480,7 +428,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
         });
 
       console.log(result);
-      console.log('result: ', result);
+      // console.log('result: ', result);
       if (
         result.assets &&
         result.assets.length > 0 &&
@@ -517,29 +465,20 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
   const handleOnFinishImage = async (
     fileId: string,
-    fileUrl: string,
-    fileName: string,
-    index: number,
     originalPath: string
   ) => {
-    const imageObject: IDisplayImage = {
-      url: fileUrl,
-      fileId: fileId,
-      fileName: fileName,
-      isUploaded: true,
-    };
-    console.log('on Finish pass thissss')
-    // createImageMessage(fileId, originalPath)
-    setDisplayImages((prevData) => {
-      const newData: IDisplayImage[] = prevData.filter((item: IDisplayImage) => item.url !== originalPath); // Filter out objects containing the desired value
-      return newData; // Update the state with the filtered array
-    });
-    setImageMultipleUri((prevData) => {
-      const newData = prevData.filter((url: string) => url !== originalPath); // Filter out objects containing the desired value
-      return newData; // Update the state with the filtered array
-    });
     createImageMessage(fileId)
-    console.log('fileId:', fileId)
+    setTimeout(() => {
+      setDisplayImages((prevData) => {
+        const newData: IDisplayImage[] = prevData.filter((item: IDisplayImage) => item.url !== originalPath); // Filter out objects containing the desired value
+        return newData; // Update the state with the filtered array
+      });
+      setImageMultipleUri((prevData) => {
+        const newData = prevData.filter((url: string) => url !== originalPath); // Filter out objects containing the desired value
+        return newData; // Update the state with the filtered array
+      });
+    }, 0);
+
   };
 
   useEffect(() => {
@@ -556,28 +495,9 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           };
         }
       );
-      setDisplayImages((prev) => [...prev, ...imagesObject]);
-    } else if (imageMultipleUri.length > 0 && displayImages.length > 0) {
-      const filteredDuplicate = imageMultipleUri.filter((url: string) => {
-        const fileName: string = url.substring(url.lastIndexOf('/') + 1);
-        return !displayImages.some((item) => item.fileName === fileName);
-      });
-
-      const imagesObject: IDisplayImage[] = filteredDuplicate.map(
-        (url: string) => {
-          const fileName: string = url.substring(url.lastIndexOf('/') + 1);
-
-          return {
-            url: url,
-            fileName: fileName,
-            fileId: '',
-            isUploaded: false,
-          };
-        }
-      );
-      setDisplayImages((prev) => [...prev, ...imagesObject]);
+      setDisplayImages([imagesObject[0]] as IDisplayImage[]);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [imageMultipleUri]);
 
   const pickImage = async () => {
@@ -585,6 +505,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: false,
       quality: 1,
+      allowsMultipleSelection: true,
     });
 
 
@@ -596,13 +517,30 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
       setImageMultipleUri(totalImages);
     }
   };
-  // const allMessages = [...loadingImages, ...sortedMessages];
-  // console.log('allMessages: ', allMessages);
-
+  const renderLoadingImages = useMemo(() => {
+    return (
+      <View style={styles.loadingImage}>
+        <FlatList
+          keyExtractor={(item, index) => item.fileName + index}
+          data={displayImages}
+          renderItem={({ item, index }) => (
+            <LoadingImage
+              source={item.url}
+              index={index}
+              onLoadFinish={handleOnFinishImage}
+              isUploaded={item.isUploaded}
+              fileId={item.fileId}
+            />
+          )}
+          scrollEnabled={false}
+          numColumns={1}
+        />
+      </View>
+    );
+  }, [displayImages, handleOnFinishImage]);
 
   return (
     <View style={styles.container}>
-      {/* {isMessagesLoading && <LoadingIndicator />} */}
       <View style={styles.chatContainer}>
         <FlatList
           data={sortedMessages}
@@ -612,45 +550,9 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           onEndReachedThreshold={0.5}
           inverted
           ref={flatListRef}
-          // onRefresh={handleRefresh}
-          ListHeaderComponent={() =>
-            <View style={styles.loadingImage}>
-              <FlatList
-                keyExtractor={(item: IDisplayImage) => item.fileName}
-                data={displayImages}
-                renderItem={({ item, index }) => (
-                  <LoadingImage
-                    source={item.url}
-                    // onClose={handleOnCloseImage}
-                    index={index}
-                    onLoadFinish={handleOnFinishImage}
-                    isUploaded={item.isUploaded}
-                    fileId={item.fileId}
-                  />
-                )}
-                scrollEnabled={false}
-                numColumns={1}
-              />
-            </View>}
+          ListHeaderComponent={renderLoadingImages}
         />
 
-        {/* {displayImages.length > 0 && (
-          <FlatList
-            data={displayImages}
-            renderItem={({ item, index }) => (
-              <LoadingImage
-                source={item.url}
-                // onClose={handleOnCloseImage}
-                index={index}
-                onLoadFinish={handleOnFinishImage}
-                isUploaded={item.isUploaded}
-                fileId={item.fileId}
-              />
-            )}
-            scrollEnabled={false}
-            numColumns={1}
-          />
-        )} */}
       </View>
 
       <KeyboardAvoidingView
