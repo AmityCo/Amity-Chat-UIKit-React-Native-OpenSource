@@ -66,17 +66,17 @@ export const styles = StyleSheet.create({
     },
     leaveChatText: {
         fontSize: 16,
-        fontWeight: '400',
+        fontWeight: '600',
         color: '#FF0000',
     },
     leaveChatLabel: {
         fontSize: 16,
-        fontWeight: '400',
+        fontWeight: '600',
         color: 'red',
     },
     reportChatLabel: {
         fontSize: 16,
-        fontWeight: '400',
+        fontWeight: '600',
  
     },
 })
