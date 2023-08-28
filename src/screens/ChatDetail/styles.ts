@@ -30,8 +30,8 @@ export const styles = StyleSheet.create({
     rowContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingVertical: 15,
-        paddingHorizontal: 16,
+        paddingVertical: 16,
+        marginHorizontal: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#DDDDDD',
     },
@@ -60,18 +60,23 @@ export const styles = StyleSheet.create({
         flex: 1,
         fontSize: 16,
     },
-    leaveChatContainer: {
+    ChatSettingContainer: {
         alignItems: 'center',
-        // paddingVertical: 15,
+        paddingHorizontal: 8
     },
     leaveChatText: {
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: '400',
         color: '#FF0000',
     },
     leaveChatLabel: {
         fontSize: 16,
-        fontWeight: '600',
+        fontWeight: '400',
         color: 'red',
+    },
+    reportChatLabel: {
+        fontSize: 16,
+        fontWeight: '400',
+ 
     },
 })

@@ -11,6 +11,7 @@ import {
 import { getAmityUser } from './user-provider';
 import { uploadFile } from './file-provider';
 import type { UserInterface } from 'src/types/user.interface';
+import { Alert } from 'react-native';
 
 export async function createAmityChannel(
   currentUserID: string,
@@ -51,17 +52,17 @@ export async function leaveAmityChannel(
   channelID: string
 ): Promise<boolean | undefined> {
   return await new Promise(async (resolve, reject) => {
-    const query = createQuery(leaveChannel, channelID);
-    runQuery(query, (result) => {
-      if (result.loading == false) {
-        if (result.error == undefined) {
-          console.log('leave channel success ' + JSON.stringify(result.data));
-          return resolve(result.data);
-        } else {
-          return reject(new Error('Unable to leave channel ' + result.error));
-        }
+    try {
+      const didLeaveChannel = await ChannelRepository.leaveChannel(channelID);
+      if(didLeaveChannel){
+        return resolve(true)
       }
-    });
+      
+    } catch (error) {
+      Alert.alert('Unable to leave channel due to ' + error, '', []);
+      return reject(new Error('Unable to leave channel ' + error));
+    }
+
   });
 }
 

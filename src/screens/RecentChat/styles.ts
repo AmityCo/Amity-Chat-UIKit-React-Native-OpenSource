@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   chatContainer:{
-    paddingBottom: 125
+    paddingBottom: 110
   }
 });
 

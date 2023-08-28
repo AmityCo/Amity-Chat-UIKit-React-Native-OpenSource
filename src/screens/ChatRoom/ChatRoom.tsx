@@ -137,7 +137,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           </View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('ChatDetail', { channelId: channelId });
+              navigation.navigate('ChatDetail', { channelId: channelId, channelType: chatReceiver?'conversation': 'community', chatReceiver: chatReceiver ?? undefined });
             }}
           >
             <Image

@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import { leaveAmityChannel } from '../../providers/channel-provider';
 import { styles } from './styles';
+import { createReport } from '@amityco/ts-sdk';
 
 interface ChatDetailProps {
     navigation: any;
@@ -9,7 +10,10 @@ interface ChatDetailProps {
 }
 
 export const ChatRoomSetting: React.FC<ChatDetailProps> = ({ navigation, route }) => {
-    const {channelId} = route.params;
+    const { channelId, channelType, chatReceiver } = route.params;
+    console.log('chatReceiver:', chatReceiver)
+    console.log('channelId:', channelId)
+    console.log('channelType:', channelType)
     const handleGroupProfilePress = () => {
         navigation.navigate('EditChatDetail', { navigation, channelID: channelId });
     };
@@ -18,10 +22,33 @@ export const ChatRoomSetting: React.FC<ChatDetailProps> = ({ navigation, route }
         navigation.navigate('MemberDetail', { navigation, channelID: channelId });
     };
 
-    const handleLeaveChatPress = () => {
-        leaveAmityChannel("add something here")
+    const handleLeaveChatPress = async () => {
+        Alert.alert(
+            'Leave chat',
+            `If leave this group, you’ll no longer be able to see any messages and files.`,
+            [
+              {
+                text: 'Cancel',
+                style: 'cancel',
+              },
+              {
+                text: 'Leave',
+                style: 'destructive',
+                onPress: () => onLeaveChat(),
+              },
+            ]
+          );
+    
     };
 
+    const onLeaveChat =async ()=>{
+        const isLeave = await leaveAmityChannel(channelId)
+        console.log('isLeave:', isLeave)
+        if(isLeave){
+            navigation.navigate('RecentChat')
+        }
+
+    }
     const renderItem = ({ item }: any) => {
         switch (item.id) {
             case 1:
@@ -47,7 +74,7 @@ export const ChatRoomSetting: React.FC<ChatDetailProps> = ({ navigation, route }
             case 3:
                 return (
                     <TouchableOpacity style={styles.rowContainer} onPress={handleLeaveChatPress}>
-                        <View style={styles.leaveChatContainer}>
+                        <View style={styles.ChatSettingContainer}>
                             <Text style={styles.leaveChatLabel}>Leave Chat</Text>
                         </View>
                     </TouchableOpacity>
@@ -56,7 +83,16 @@ export const ChatRoomSetting: React.FC<ChatDetailProps> = ({ navigation, route }
                 return null;
         }
     };
-
+    async function flagUser() {
+        if(chatReceiver){
+            const didCreateUserReport = await createReport('user', chatReceiver.userId);
+            if(didCreateUserReport){
+                Alert.alert('Report sent', '', []);
+            }
+       
+        }
+  
+      }
     const data = [
         { id: 1 },
         { id: 2 },
@@ -65,11 +101,19 @@ export const ChatRoomSetting: React.FC<ChatDetailProps> = ({ navigation, route }
 
     return (
         <View style={styles.container}>
-            <FlatList
-                data={data}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id.toString()}
-            />
+            {channelType == 'conversation' ?
+                <TouchableOpacity style={styles.rowContainer} onPress={flagUser}>
+                    <View style={styles.ChatSettingContainer}>
+                        <Text style={styles.reportChatLabel}>Report User</Text>
+                    </View>
+                </TouchableOpacity> :
+                <FlatList
+                    data={data}
+                    renderItem={renderItem}
+                    keyExtractor={(item) => item.id.toString()}
+                />
+            }
+
         </View>
     );
 };
