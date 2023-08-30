@@ -1,206 +1,195 @@
-/* eslint-disable react/no-unstable-nested-components */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-shadow */
-import React, { useEffect, useRef, useState } from 'react';
+import { ChannelRepository, UserRepository } from '@amityco/ts-sdk';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
-  ListRenderItem,
-  NativeScrollEvent,
-  Platform,
-  SectionList,
+  TouchableOpacity,
   View,
-  ActionSheetIOS,
-  Alert,
+  Text,
+  Modal,
+  SectionList,
+  NativeScrollEvent,
+  ListRenderItemInfo,
+  TextInput,
+  FlatList,
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import useAuth from '../../hooks/useAuth';
-import SearchBar from '../../components/SearchBar/index';
+import { SvgXml } from 'react-native-svg';
 import { styles } from './styles';
-import SectionHeader from '../../components/ListSectionHeader/index';
-import UserItem from '../../components/UserItem/index';
-import type { UserGroup } from '../../types/user.interface';
-import { groupUsers, reportUser } from '../../providers/user-provider';
-import DoneButton from '../../components/DoneButton';
-import {
-  createAmityChannel,
-  queryChannelMember,
-} from '../../providers/channel-provider';
-import CloseButton from '../../components/CloseButton/index';
-import type { queryUsers } from '@amityco/ts-sdk';
-import { LoadingOverlay } from '../../components/LoadingOverlay';
+import { backIcon, circleCloseIcon, closeIcon, plusIcon, searchIcon } from '../../svg/svg-xml-list';
+import type { UserInterface } from '../../types/user.interface';
 
-export default function MemberDetail({ navigation, route }: any) {
-  //   const { t, i18n } = useTranslation();
+import SectionHeader from '../../components/ListSectionHeader';
+import SelectedUserHorizontal from '../../components/SelectedUserHorizontal';
+import UserItem from '../../components/UserItem';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import CustomTab from '../../components/CustomTab';
+interface IModal {
+  visible: boolean;
+  userId?: string;
+  initUserList?: UserInterface[];
+  onClose?: () => void;
+  onFinish?: (users: UserInterface[]) => void;
+}
+export type SelectUserList = {
+  title: string;
+  data: UserInterface[];
+};
+
+export default function MemberDetail({ route, navigation }: any) {
   const { channelID } = route.params;
-  const { client } = useAuth();
-  const [showLoadingIndicator, setShowLoadingIndicator] = useState(true);
-  const [sectionedUserList, setSectionedUserList] = useState<UserGroup[]>([]);
-  const [selectedUserList] = useState<Amity.User[]>([]);
-  const [isScrollEnd, setIsScrollEnd] = useState(false);
-  const [userListOptions, setUserListOptions] =
-    useState<Amity.RunQueryOptions<typeof queryUsers>>();
-  const { loading, nextPage } = userListOptions ?? {};
-  const selectedUserListRef = useRef(selectedUserList);
-  const userList = useRef<Amity.User[]>([]);
-  const searchText = useRef<string>();
-  const searchUserList = useRef<Amity.User[]>([]);
-  let isPaginate = false;
+  // const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  const [sectionedGroupUserList, setSectionedGroupUserList] = useState<SelectUserList[]>([]);
+  // console.log('sectionedGroupUserList:', sectionedGroupUserList)
+  const [sectionedUserList, setSectionedUserList] = useState<UserInterface[]>([]);
+  console.log('sectionedUserList:', sectionedUserList)
+  const [selectedUserList, setSelectedUserList] = useState<UserInterface[]>([]);
+  // console.log('selectedUserList:', selectedUserList)
+  // const [isScrollEnd, setIsScrollEnd] = useState(false);
+  const [usersObject, setUsersObject] = useState<Amity.LiveCollection<Amity.Membership<"channel">>>();
+  const [searchTerm, setSearchTerm] = useState('');
+  const [tabIndex, setTabIndex] = useState<number>(1)
+  const { data: userArr = [], onNextPage } = usersObject ?? {};
+  // console.log('userArr:', userArr)
 
-  const loadUserList = async (
-    nextPage?: Amity.Page<number> | undefined,
-    displayName?: string
-  ) => {
-    try {
-      const result: (Amity.User | undefined)[] = (
-        await queryChannelMember(
-          setUserListOptions,
-          channelID,
-          nextPage,
-          displayName
-        )
-      ).map((value) => {
-        return value.user;
-      });
-      let sectionedList: UserGroup[] = [];
-      console.log(
-        'enter which one' +
-          (displayName != undefined && displayName != '') +
-          ' --- ' +
-          displayName
-      );
-      if (displayName != undefined && displayName != '') {
-        searchUserList.current = [];
-        searchUserList.current = result as Amity.User[];
-        sectionedList = groupUsers(searchUserList.current);
-      } else {
-        console.log(
-          'enter not search' +
-            (!isPaginate && sectionedList.length > 0) +
-            ' ---- ' +
-            `${isPaginate}` +
-            ' ----- ' +
-            `${userList.current.length}`
-        );
-        if (isPaginate || userList.current.length == 0) {
-          userList.current = userList.current.concat(result as Amity.User[]);
-        }
-        sectionedList = groupUsers(userList.current);
+
+
+  //   useEffect(() => {
+  //  setSelectedUserList(initUserList)
+  //   }, [initUserList])
+
+  const queryAccounts = (text: string = '', roles?: string[]) => {
+
+    ChannelRepository.Membership.getMembers(
+      { channelId: channelID , limit: 15, search: text, roles: roles ?? [] },
+      (data) => {
+      	console.log('data:', data)
+        setUsersObject(data)
+
       }
-      setSectionedUserList([...sectionedList]);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      isPaginate = false;
-      setShowLoadingIndicator(false);
-    }
+    );
+
+
+  };
+  const handleChange = (text: string) => {
+    setSearchTerm(text);
   };
   useEffect(() => {
-    loadUserList();
-  }, []);
+    if (searchTerm.length > 0 && tabIndex ===1) {
+      queryAccounts(searchTerm);
+    }
+    else if(searchTerm.length > 0 && tabIndex ===2){
+      queryAccounts(searchTerm,['channel-moderator'] );
+    }
+  }, [searchTerm]);
+
+  const clearButton = () => {
+    setSearchTerm('');
+    setSectionedGroupUserList([])
+  };
+
+  const createUserList = () => {
+    const sectionUserArr = userArr.map((item) => {
+      return { userId: item.userId, displayName: item.user?.displayName as string, avatarFileId: item.user?.avatarFileId as string }
+    })
+    setSectionedUserList(sectionUserArr)
+ 
+  }
+
   useEffect(() => {
-    if (isScrollEnd) {
-      isPaginate = true;
-      handleLoadMore();
-    }
-  }, [isScrollEnd]);
+    createUserList()
+  }, [userArr])
 
-  React.useLayoutEffect(() => {
-    // Set the headerRight component to a TouchableOpacity
-    navigation.setOptions({
-      headerLeft: () => <CloseButton navigation={navigation} />,
-      headerRight: () => (
-        <DoneButton navigation={navigation} onDonePressed={onDonePressed} />
-      ),
-    });
-  }, [navigation]);
+  useEffect(() => {
+    if (searchTerm.length === 0 && tabIndex ===1) {
+      queryAccounts()
+    }else if(searchTerm.length === 0 && tabIndex ===2){
+        console.log('pass this')
+        queryAccounts('', ['channel-moderator'])
+      }
 
-  const handleLoadMore = () => {
-    if (!loading) {
-      loadUserList(nextPage);
-    }
-  };
-  const handleScroll = ({
-    nativeEvent,
-  }: {
-    nativeEvent: NativeScrollEvent;
-  }) => {
-    const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
-    const isEnd =
-      layoutMeasurement.height + contentOffset.y >= contentSize.height;
+  }, [searchTerm,tabIndex])
 
-    setIsScrollEnd(isEnd);
-  };
-  const renderSectionHeader = ({ section }: { section: UserGroup }) => (
-    <SectionHeader title={section.title} />
-  );
 
-  const handleSearch = (text: string) => {
-    searchText.current = text;
 
-    setTimeout(() => {
-      loadUserList(undefined, text);
-    }, 500);
-  };
-  const onThreeDotTap = (user: Amity.User) => {
-    if (Platform.OS === 'ios') {
-      ActionSheetIOS.showActionSheetWithOptions(
-        {
-          options: ['Cancel', 'Report User'],
-          cancelButtonIndex: 0,
-        },
-        () => {
-          reportUser(user.userId);
-        }
-      );
-    } else {
-      Alert.alert('Report', '', [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Report user',
-          onPress: () => {
-            reportUser(user.userId);
-          },
-        },
-      ]);
-    }
+  const onUserPressed = (user: UserInterface) => {
+    console.log('user:', user)
+
   };
 
-  const onDonePressed = async () => {
-    try {
-      const result = await createAmityChannel(
-        (client as Amity.Client).userId!,
-        selectedUserListRef.current
-      );
-      console.log('create chat success ' + JSON.stringify(result));
-    } catch (error) {
-      console.log('create chat error ' + JSON.stringify(error));
-      console.error(error);
-    } finally {
-      setShowLoadingIndicator(false);
-    }
-  };
 
-  const renderItem: ListRenderItem<Amity.User> = ({ item }) => {
+  const renderItem = ({ item }: ListRenderItemInfo<UserInterface>) => {
+
+    const userObj: UserInterface = { userId: item.userId, displayName: item.displayName as string, avatarFileId: item.avatarFileId as string }
     return (
-      <UserItem user={item} showThreeDot={true} onThreeDotTap={onThreeDotTap} />
+      <UserItem showThreeDot={true} user={userObj}  onThreeDotTap={onUserPressed} />
     );
   };
-  const insets = useSafeAreaInsets();
+
+
+  const handleLoadMore = () => {
+    if (onNextPage) {
+      onNextPage()
+    }
+  }
+
+  const onDeleteUserPressed = (user: UserInterface) => {
+    const removedUser = selectedUserList.filter(item => item !== user)
+    setSelectedUserList(removedUser)
+  }
+
+
+  // const onDone = () => {
+  //   onFinish && onFinish(selectedUserList)
+  //   setSelectedUserList([])
+  //   onClose && onClose()
+  // }
+  const handleGoBack = () => {
+    navigation.goBack()
+  }
+
+  const handleTabChange = (index: number) => {
+    console.log('index:', index)
+    setTabIndex(index)
+
+  }
   return (
-    <View style={[styles.container, { paddingBottom: insets.bottom + 60 }]}>
-      <LoadingOverlay
-        isLoading={showLoadingIndicator && sectionedUserList.length <= 0}
-        loadingText="Loading..."
-      />
-      <View>
-        <SearchBar handleSearch={handleSearch} />
-        <SectionList
-          sections={sectionedUserList}
-          renderItem={renderItem}
-          onScroll={handleScroll}
-          renderSectionHeader={renderSectionHeader}
-          // keyExtractor={(item, index) => index}
-        />
+
+    <View style={styles.container}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleGoBack} style={styles.closeButton}>
+          <SvgXml xml={backIcon} width="16" height="16" />
+        </TouchableOpacity>
+        <View style={styles.headerTextContainer}>
+          <Text style={styles.headerText}>Member Detail</Text>
+        </View>
+        <TouchableOpacity disabled={selectedUserList.length === 0} >
+          <SvgXml xml={plusIcon} width="24" height="24" />
+        </TouchableOpacity>
       </View>
+      <CustomTab tabName={['Members', 'Moderators']} onTabChange={handleTabChange} />
+      <View style={styles.inputWrap}>
+        <TouchableOpacity onPress={() => queryAccounts(searchTerm)}>
+          <SvgXml xml={searchIcon} width="20" height="20" />
+        </TouchableOpacity>
+        <TextInput
+          style={styles.input}
+          value={searchTerm}
+          onChangeText={handleChange}
+        />
+        <TouchableOpacity onPress={clearButton}>
+          <SvgXml xml={circleCloseIcon} width="20" height="20" />
+        </TouchableOpacity>
+      </View>
+
+      <FlatList
+        data={sectionedUserList}
+        renderItem={renderItem}
+        // renderSectionHeader={renderSectionHeader}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        keyExtractor={(item) => item.userId}
+
+      />
     </View>
+
   );
 }

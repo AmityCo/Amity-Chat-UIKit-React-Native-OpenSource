@@ -50,6 +50,7 @@ export default function ChatNavigator() {
           component={MemberDetail}
           options={{
             title: 'Member Detail',
+            headerShown: false
           }}
         />
         <Stack.Screen
