@@ -17,12 +17,22 @@ export const styles = StyleSheet.create({
         height: 64,
         borderRadius: 32
     },
+    uploadedImage:{
+        width: 55,
+        height: 53,
+        borderRadius: 32
+    },
     overlay: {
         
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1,
         backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    },
+    uploadedCameraIconContainer: {
+        position: 'absolute',
+        bottom: 3,
+        right: -5,
     },
     cameraIconContainer: {
         position: 'absolute',

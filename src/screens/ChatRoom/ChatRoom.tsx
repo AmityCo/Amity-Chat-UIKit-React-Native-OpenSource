@@ -28,7 +28,7 @@ import {
   SubChannelRepository,
   getSubChannelTopic,
   subscribeTopic,
-} from '@amityco/ts-sdk';
+} from '@amityco/ts-sdk-react-native';
 import useAuth from '../../hooks/useAuth';
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -64,7 +64,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
 
   const { chatReceiver, groupChat, channelId } = route.params;
-  // console.log('groupChat:', groupChat)
+
   const { client } = useAuth();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [messagesData, setMessagesData] = useState<Amity.LiveCollection<Amity.Message>>();
@@ -137,7 +137,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           </View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('ChatDetail', { channelId: channelId, channelType: chatReceiver?'conversation': 'community', chatReceiver: chatReceiver ?? undefined });
+              navigation.navigate('ChatDetail', { channelId: channelId, channelType: chatReceiver?'conversation': 'community', chatReceiver: chatReceiver ?? undefined , groupChat: groupChat?? undefined});
             }}
           >
             <Image
@@ -160,7 +160,6 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
       SubChannelRepository.getSubChannel(
         channelId,
         ({ data: subChannel }) => {
-          console.log("subChannel: ", subChannel);
           setSubChannelData(subChannel);
         }
       );
@@ -309,16 +308,15 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   };
 
   const renderChatMessages = (message: IMessage, index: number) => {
-    // console.log('message: ', message);
+
     const isUserChat: boolean =
       message?.user?._id === (client as Amity.Client).userId;
     let isRenderDivider = false
     const messageDate = moment(message.createdAt)
-    console.log('messageDate:', messageDate)
+
     const previousMessageDate = moment(sortedMessages[index + 1]?.createdAt)
     const isSameDay = messageDate.isSame(previousMessageDate, 'day');
-    console.log('isSameDay:', isSameDay)
-    console.log('previousMessageDate:', previousMessageDate)
+
     if (!isSameDay || index === sortedMessages.length - 1) {
       isRenderDivider = true
     }
@@ -427,8 +425,6 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           quality: 1,
         });
 
-      console.log(result);
-      // console.log('result: ', result);
       if (
         result.assets &&
         result.assets.length > 0 &&

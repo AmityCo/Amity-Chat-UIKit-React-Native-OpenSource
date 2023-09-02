@@ -1,7 +1,7 @@
 {
-  "name": "@amityco/asc-react-native-ui-kit",
-  "version": "0.1.0",
-  "description": "test",
+  "name": "@amityco/react-native-chat-ui-kit",
+  "version": "1.0.0",
+  "description": "react native chat uikit",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
   "types": "lib/typescript/src/index.d.ts",
@@ -154,7 +154,7 @@
     ]
   },
   "dependencies": {
-    "@amityco/ts-sdk": "^6.5.6",
+    "@amityco/ts-sdk-react-native": "6.7.1-cafe37a.0",
     "@react-navigation/native": "6.1.6",
     "@react-navigation/native-stack": "6.9.10",
     "@react-navigation/stack": "6.3.16",

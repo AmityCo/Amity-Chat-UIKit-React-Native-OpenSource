@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/no-unstable-nested-components */
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -11,137 +11,116 @@ import {
   Alert,
   TextInput,
 } from 'react-native';
-import {
-  launchCamera,
-  launchImageLibrary,
-  CameraOptions,
-  ImageLibraryOptions,
-  ImagePickerResponse,
-} from 'react-native-image-picker';
+
 import { styles } from './styles';
 import CloseButton from '../../components/CloseButton/index';
 import DoneButton from '../../components/DoneButton';
 import { updateAmityChannel } from '../../providers/channel-provider';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
-
+import * as ImagePicker from 'expo-image-picker';
+import LoadingImage from '../../components/LoadingImage';
+import type { RootStackParamList } from 'src/routes/RouteParamList';
+import { RouteProp, useRoute } from '@react-navigation/native';
 interface EditChatDetailProps {
   navigation: any;
   route: any;
 }
 
-export interface Action {
-  title: string;
-  type: 'capture' | 'library';
-  options: CameraOptions | ImageLibraryOptions;
-}
 
-const actions: Action[] = [
-  {
-    title: 'Take Image',
-    type: 'capture',
-    options: {
-      saveToPhotos: true,
-      mediaType: 'photo',
-      includeBase64: false,
-    },
-  },
-  {
-    title: 'Select Image',
-    type: 'library',
-    options: {
-      selectionLimit: 1,
-      mediaType: 'photo',
-      includeBase64: false,
-    },
-  },
-];
 
 export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
   navigation,
-  route,
 }) => {
+
+
+  const route = useRoute<RouteProp<RootStackParamList, 'EditChatDetail'>>();
   const MAX_CHARACTER_COUNT = 100;
-  const [imageUri, setImageUri] = useState<string | undefined>();
-  const imageUriRef = useRef(imageUri);
-  const [displayName, setDisplayName] = useState<string | undefined>();
-  const displayNameRef = useRef(displayName);
+  const { channelId, groupChat } = route.params;
+
+  const [displayName, setDisplayName] = useState<string | undefined>(groupChat?.displayName);
   const [characterCount, setCharacterCount] = useState(0);
   const [showLoadingIndicator, setShowLoadingIndicator] = useState(false);
-  const { channelID } = route.params;
+  const [imageMultipleUri, setImageMultipleUri] = useState<string[]>([]);
+  const [uploadedFileId, setUploadedFileId] = useState<string>()
 
-  React.useLayoutEffect(() => {
-    // Set the headerRight component to a TouchableOpacity
-    navigation.setOptions({
-      headerLeft: () => <CloseButton navigation={navigation} />,
-      headerRight: () => (
-        <DoneButton navigation={navigation} onDonePressed={onDonePressed} />
-      ),
-    });
-  }, [navigation]);
 
+
+  navigation.setOptions({
+    headerLeft: () => <CloseButton navigation={navigation} />,
+    headerRight: () => (
+      <DoneButton navigation={navigation} onDonePressed={onDonePressed} />
+    ),
+  });
   const onDonePressed = async () => {
+
     try {
+
       setShowLoadingIndicator(true);
-      console.log(
-        'check edit image + name ' +
-          displayNameRef.current +
-          ' -- ' +
-          imageUriRef.current +
-          ' ---- ' +
-          channelID
-      );
       const result = await updateAmityChannel(
-        channelID,
-        imageUriRef.current,
-        displayNameRef.current
+        channelId,
+        uploadedFileId as string,
+        displayName
       );
+      console.log('result:', result)
+      if (result) {
+
+        setShowLoadingIndicator(false);
+        navigation.goBack();
+      }
       console.log('Update chat success ' + JSON.stringify(result));
     } catch (error) {
       console.log('Update chat error ' + JSON.stringify(error));
       console.error(error);
-    } finally {
-      setShowLoadingIndicator(false);
     }
   };
 
-  const openCamera = async () => {
-    await launchCamera(
-      actions[0] as unknown as CameraOptions,
-      (response: ImagePickerResponse) => {
-        if (!response.didCancel && !response.errorCode) {
-          if (response.assets) {
-            imageUriRef.current = (
-              response.assets[0] as Record<string, any>
-            ).uri;
-            setImageUri((response.assets[0] as Record<string, any>).uri);
-          }
-        }
+  const pickCamera = async () => {
+    // No permissions request is necessary for launching the image library
+    const permission = await ImagePicker.requestCameraPermissionsAsync();
+    setImageMultipleUri([])
+    if (permission.granted) {
+      let result: ImagePicker.ImagePickerResult =
+        await ImagePicker.launchCameraAsync({
+          mediaTypes: ImagePicker.MediaTypeOptions.All,
+          aspect: [4, 3],
+          quality: 1,
+        });
+
+      console.log(result);
+      // console.log('result: ', result);
+      if (
+        result.assets &&
+        result.assets.length > 0 &&
+        result.assets[0] !== null &&
+        result.assets[0]
+      ) {
+        const selectedImages = result.assets;
+        const imageUriArr: string[] = selectedImages.map((item) => item.uri);
+        const imagesArr = [...imageMultipleUri];
+        const totalImages = imagesArr.concat(imageUriArr);
+        setImageMultipleUri(totalImages);
+        // do something with uri
       }
-    );
+    }
+
   };
 
-  const openImageGallery = async () => {
-    await launchImageLibrary(
-      actions[1] as unknown as ImageLibraryOptions,
-      (response) => {
-        if (response.didCancel) {
-          console.log('User cancelled image picker');
-        } else if (response.errorCode) {
-          console.log(
-            'ImagePicker Error: ',
-            response.errorCode + ', ' + response.errorMessage
-          );
-        } else {
-          if (response.assets) {
-            imageUriRef.current = (
-              response.assets[0] as Record<string, any>
-            ).uri;
-            setImageUri((response.assets[0] as Record<string, any>).uri);
-            // console.log('printing image uri ' + response.assets[0].uri);
-          }
-        }
-      }
-    );
+  const pickImage = async () => {
+    setImageMultipleUri([])
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: false,
+      quality: 1,
+    });
+
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const selectedImages = result.assets;
+      const imageUriArr: string[] = selectedImages.map((item) => item.uri);
+      const imagesArr = [...imageMultipleUri];
+      const totalImages = imagesArr.concat(imageUriArr);
+      setImageMultipleUri(totalImages);
+    }
   };
 
   const handleAvatarPress = () => {
@@ -153,27 +132,33 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
         },
         (buttonIndex) => {
           if (buttonIndex === 1) {
-            openCamera();
+            pickCamera();
           } else if (buttonIndex === 2) {
-            openImageGallery();
+            pickImage();
           }
         }
       );
     } else {
       Alert.alert('Select a Photo', '', [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Take Photo', onPress: openCamera },
-        { text: 'Choose from Library', onPress: openImageGallery },
+        { text: 'Take Photo', onPress: pickCamera },
+        { text: 'Choose from Library', onPress: pickImage },
       ]);
     }
   };
 
   const handleTextChange = (text: string) => {
-    displayNameRef.current = text;
     setDisplayName(text);
     setCharacterCount(text.length);
   };
+  const handleOnFinishImage = async (
+    fileId: string,
+  ) => {
+    console.log('fileId:', fileId)
+    setUploadedFileId(fileId)
 
+
+  }
   return (
     <View style={styles.container}>
       <LoadingOverlay
@@ -182,16 +167,37 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
       />
       <View style={styles.avatarContainer}>
         <TouchableOpacity onPress={handleAvatarPress}>
-          <Image
+          {imageMultipleUri.length > 0 ?
+
+            <View>
+              <LoadingImage
+                containerStyle={styles.uploadedImage}
+                isShowSending={false}
+                source={imageMultipleUri[0] as string}
+                onLoadFinish={handleOnFinishImage}
+              />
+            </View>
+
+
+            : <Image
+              style={styles.avatar}
+              source={
+                groupChat?.avatarFileId
+                  ? { uri: `https://api.amity.co/api/v3/files/${groupChat?.avatarFileId}/download` }
+                  : require('../../../assets/icon/Placeholder.png')
+              }
+            />}
+
+          {/* <Image
             style={styles.avatar}
             source={
-              imageUri
-                ? { uri: imageUri }
+              imageMultipleUri.length>0
+                ? { uri: imageMultipleUri[0] }
                 : require('../../../assets/icon/Placeholder.png')
             }
-          />
+          /> */}
         </TouchableOpacity>
-        <View style={styles.cameraIconContainer}>
+        <View style={imageMultipleUri[0]?styles.uploadedCameraIconContainer:styles.cameraIconContainer}>
           <TouchableOpacity onPress={handleAvatarPress}>
             <View style={styles.cameraIcon}>
               <Image

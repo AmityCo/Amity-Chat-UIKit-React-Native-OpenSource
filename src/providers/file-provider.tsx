@@ -1,4 +1,4 @@
-import { FileRepository } from '@amityco/ts-sdk';
+import { FileRepository } from '@amityco/ts-sdk-react-native';
 
 import { Platform } from 'react-native';
 

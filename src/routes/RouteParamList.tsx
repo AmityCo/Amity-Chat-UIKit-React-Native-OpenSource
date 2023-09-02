@@ -15,7 +15,11 @@ export type RootStackParamList = {
     channelId: string,
     channelType: string,
     chatReceiver?: UserInterface;
+    groupChat?: IGroupChatObject;
   };
   MemberDetail: undefined;
-  EditChatDetail: undefined;
+  EditChatDetail:  {
+    channelId: string,
+    groupChat?: IGroupChatObject;
+  };
 };

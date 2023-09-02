@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@amityco/asc-react-native-ui-kit": ["./src/index"]
+      "@amityco/react-native-chat-ui-kit": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,

@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useMemo, useRef } from 'react';
+import React, { ReactElement, useMemo, useRef } from 'react';
 
 import {
   View,
@@ -8,7 +8,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 
-import { ChannelRepository, getChannelTopic, subscribeTopic } from '@amityco/ts-sdk';
+import { ChannelRepository, getChannelTopic, subscribeTopic } from '@amityco/ts-sdk-react-native';
 import ChatList, { IChatListProps, IGroupChatObject } from '../../components/ChatList/index';
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
@@ -18,30 +18,30 @@ import styles from './styles';
 import CustomText from '../../components/CustomText';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import { Client } from '@amityco/ts-sdk-react-native'
 import LoadingIndicator from '../../components/LoadingIndicator/index';
 import AddMembersModal from '../../components/AddMembersModal';
 import type { UserInterface } from '../../types/user.interface';
 import { createAmityChannel } from '../../providers/channel-provider';
+
 export default function RecentChat() {
-  const { isConnected, client } = useAuth();
+  const { client, isConnected } = useAuth();
 
   const [channelObjects, setChannelObjects] = useState<IChatListProps[]>([]);
   const [loadChannel, setLoadChannel] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState(false)
 
-  const [isRefresh, setIsRefresh] = useState<boolean>(false)
-  // console.log('selectedUserIds:', selectedUsers)
-  // const [unSubFunc, setUnSubFunc] = useState<any>();
 
   const flatListRef = useRef(null);
 
   const [channelData, setChannelData] = useState<Amity.LiveCollection<Amity.Channel>>();
 
+
   const {
     data: channels = [],
     onNextPage,
     hasNextPage,
+
   } = channelData ?? {};
   const disposers: Amity.Unsubscriber[] = [];
   const subscribedChannels: Amity.Channel['channelId'][] = [];
@@ -57,17 +57,15 @@ export default function RecentChat() {
 
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
- 
+
   navigation.setOptions({
-    // eslint-disable-next-line react/no-unstable-nested-components
+
     header: () => (
       <SafeAreaView style={styles.topBar}>
         <CustomText style={styles.titleText}>Chat</CustomText>
         <TouchableOpacity
           onPress={() => {
-            // navigation.navigate('SelectMembers')
             setIsModalVisible(true)
-            // navigation.navigate('SelectMembers');
           }}
         >
           <Image
@@ -82,40 +80,38 @@ export default function RecentChat() {
 
 
   const onQueryChannel = () => {
-    setIsRefresh(true)
     const unsubscribe = ChannelRepository.getChannels(
       { sortBy: 'lastActivity', limit: 10, membership: 'member' },
       (value) => {
         setChannelData(value);
         subscribeChannels(channels);
-        setIsRefresh(false)
       },
     );
     disposers.push(unsubscribe);
-    // setUnSubFunc(() => unsubscribe);
   };
-  useEffect(() => {
-    if (isConnected) {
-      setTimeout(() => {
-        onQueryChannel();
-      }, 700);
+  const startSync = async () => {
+    const res = await Client.startUnreadSync();
+    console.log('res:', res)
+  }
 
-    }
+  useEffect(() => {
+    setTimeout(() => {
+      startSync()
+    }, 700);
+    setTimeout(() => {
+      onQueryChannel();
+    }, 1000);
+
+
 
     return () => {
       disposers.forEach(fn => fn());
     };
   }, [isConnected]);
-const handleRefresh=()=>{
-  disposers.forEach(fn => fn());
-  onQueryChannel()
-}
 
-  console.log('isConnected:', isConnected)
 
   useEffect(() => {
     if (channels.length > 0) {
-      // console.log('channels:', channels)
       const formattedChannelObjects: IChatListProps[] = channels.map(
         (item: Amity.Channel<any>) => {
           const lastActivityDate: string = moment(item.lastActivity).format(
@@ -143,10 +139,8 @@ const handleRefresh=()=>{
       setChannelObjects([...formattedChannelObjects]);
       setLoadChannel(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelData]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleLoadMore = () => {
     if (hasNextPage && onNextPage) {
       onNextPage();
@@ -160,7 +154,6 @@ const handleRefresh=()=>{
   const handleOnFinish = async (users: UserInterface[]) => {
     const channel = await createAmityChannel((client as Amity.Client).userId as string, users)
     if (channel) {
-      console.log('channelId:', channel)
       try {
         if (users.length === 1 && users[0]) {
           const oneOnOneChatObject: UserInterface = {
@@ -168,13 +161,12 @@ const handleRefresh=()=>{
             displayName: users[0].displayName as string,
             avatarFileId: users[0].avatarFileId as string,
           };
-          console.log('oneOnOneChatObject:', oneOnOneChatObject)
-               
-            navigation.navigate('ChatRoom', {
-              channelId: channel.channelId,
-              chatReceiver: oneOnOneChatObject,
-            });
-        
+
+          navigation.navigate('ChatRoom', {
+            channelId: channel.channelId,
+            chatReceiver: oneOnOneChatObject,
+          });
+
         } else if (users.length > 1) {
           const chatDisplayName = users.map(
             (item) => item.displayName
@@ -193,16 +185,16 @@ const handleRefresh=()=>{
             avatarFileId: channel.avatarFileId
           };
           console.log('groupChatObject: ', groupChatObject);
-        
+
 
           navigation.navigate('ChatRoom', {
             channelId: channel.channelId,
             groupChat: groupChatObject,
           });
-      
+
         }
-  
-        console.log('create chat success ' + JSON.stringify( channel));
+
+        console.log('create chat success ' + JSON.stringify(channel));
       } catch (error) {
         console.log('create chat error ' + JSON.stringify(error));
         console.error(error);
@@ -225,8 +217,6 @@ const handleRefresh=()=>{
           onEndReachedThreshold={0.3}
           ref={flatListRef}
           contentContainerStyle={{ flexGrow: 1 }}
-          // onRefresh={handleRefresh}
-          // refreshing={isRefresh}
         />
       </View>
     );

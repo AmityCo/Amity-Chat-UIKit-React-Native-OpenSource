@@ -2,12 +2,13 @@
 # yarn lockfile v1
 
 
-"@amityco/ts-sdk@^6.5.6":
-  version "6.5.6"
-  resolved "https://registry.yarnpkg.com/@amityco/ts-sdk/-/ts-sdk-6.5.6.tgz#f1bd2e5f3c478c8d896b5ac69840aa2c1e3a5715"
-  integrity sha512-5yfaXa1ZtUtwAjea8uhMn7eRuDNnH33ESYEWoWtSFyW7KLoX9LyZyPJblx0EhyVCeb/eCpc3QiUw7D7YmCFrog==
+"@amityco/ts-sdk-react-native@6.7.1-cafe37a.0":
+  version "6.7.1-cafe37a.0"
+  resolved "https://registry.yarnpkg.com/@amityco/ts-sdk-react-native/-/ts-sdk-react-native-6.7.1-cafe37a.0.tgz#3acf5828a2ee14bc9df483c607cba205969800fa"
+  integrity sha512-Iw/nWeLHPVrpUsC7RPRk292cAG0jZMUwj3IwWMAB474rRiegvm7WbW6L952Ntq9+k3AtWvXAWDExJsc6BwDmbg==
   dependencies:
     "@react-native-async-storage/async-storage" "^1.17.7"
+    "@react-native-community/netinfo" "^9.4.1"
     agentkeepalive "^4.2.1"
     axios "^1.2.3"
     debug "^4.3.4"
@@ -2118,6 +2119,11 @@
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@react-native-community/eslint-plugin/-/eslint-plugin-1.3.0.tgz#9e558170c106bbafaa1ef502bd8e6d4651012bf9"
   integrity sha512-+zDZ20NUnSWghj7Ku5aFphMzuM9JulqCW+aPXT6IfIXFbb8tzYTTOSeRFOtuekJ99ibW2fUCSsjuKNlwDIbHFg==
+
+"@react-native-community/netinfo@^9.4.1":
+  version "9.4.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/netinfo/-/netinfo-9.4.1.tgz#7b880758adca65fe47ee866cf7b00416b9dcc192"
+  integrity sha512-dAbY5mfw+6Kas/GJ6QX9AZyY+K+eq9ad4Su6utoph/nxyH3whp5cMSgRNgE2VhGQVRZ/OG0qq3IaD3+wzoqJXw==
 
 "@react-native/assets@1.0.0":
   version "1.0.0"

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
 import { leaveAmityChannel } from '../../providers/channel-provider';
 import { styles } from './styles';
-import { createReport } from '@amityco/ts-sdk';
+import { createReport } from '@amityco/ts-sdk-react-native';
 
 interface ChatDetailProps {
     navigation: any;
@@ -10,12 +10,12 @@ interface ChatDetailProps {
 }
 
 export const ChatRoomSetting: React.FC<ChatDetailProps> = ({ navigation, route }) => {
-    const { channelId, channelType, chatReceiver } = route.params;
+    const { channelId, channelType, chatReceiver, groupChat } = route.params;
     console.log('chatReceiver:', chatReceiver)
     console.log('channelId:', channelId)
     console.log('channelType:', channelType)
     const handleGroupProfilePress = () => {
-        navigation.navigate('EditChatDetail', { navigation, channelID: channelId });
+        navigation.navigate('EditChatDetail', { navigation, channelId: channelId, groupChat: groupChat });
     };
 
     const handleMembersPress = () => {

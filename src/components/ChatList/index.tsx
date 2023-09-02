@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { View, TouchableHighlight, Image } from 'react-native';
 
-import { ChannelRepository } from '@amityco/ts-sdk';
+import { ChannelRepository } from '@amityco/ts-sdk-react-native';
 import CustomText from '../CustomText';
 import styles from './styles';
 import { useNavigation } from '@react-navigation/native';

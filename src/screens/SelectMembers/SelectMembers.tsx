@@ -1,12 +1,9 @@
-import { UserRepository } from '@amityco/ts-sdk';
-import React, { useEffect, useMemo, useState } from 'react';
+import { UserRepository } from '@amityco/ts-sdk-react-native';
+import React, { useEffect, useState } from 'react';
 import {
   TouchableOpacity,
   View,
   Text,
-  Modal,
-  SectionList,
-  NativeScrollEvent,
   ListRenderItemInfo,
   TextInput,
   FlatList,
@@ -16,47 +13,30 @@ import { styles } from './styles';
 import { circleCloseIcon, closeIcon, searchIcon } from '../../svg/svg-xml-list';
 import type { UserInterface } from '../../types/user.interface';
 
-import SectionHeader from '../../components/ListSectionHeader';
 import SelectedUserHorizontal from '../../components/SelectedUserHorizontal';
 import UserItem from '../../components/UserItem';
-interface IModal {
-  visible: boolean;
-  userId?: string;
-  initUserList?: UserInterface[];
-  onClose?: () => void;
-  onFinish?: (users: UserInterface[]) => void;
-}
+
 export type SelectUserList = {
   title: string;
   data: UserInterface[];
 };
 
-export default function SelectMembers({ navigation }: any) {
-  const [sectionedGroupUserList, setSectionedGroupUserList] = useState<SelectUserList[]>([]);
-  // console.log('sectionedGroupUserList:', sectionedGroupUserList)
+export default function SelectMembers() {
+
   const [sectionedUserList, setSectionedUserList] = useState<UserInterface[]>([]);
   console.log('sectionedUserList:', sectionedUserList)
   const [selectedUserList, setSelectedUserList] = useState<UserInterface[]>([]);
-  // console.log('selectedUserList:', selectedUserList)
-  // const [isScrollEnd, setIsScrollEnd] = useState(false);
   const [usersObject, setUsersObject] = useState<Amity.LiveCollection<Amity.User>>();
   const [searchTerm, setSearchTerm] = useState('');
 
   const { data: userArr = [], onNextPage } = usersObject ?? {};
-  // console.log('userArr:', userArr)
 
-
-
-  //   useEffect(() => {
-  //  setSelectedUserList(initUserList)
-  //   }, [initUserList])
 
   const queryAccounts = (text: string = '') => {
 
     UserRepository.getUsers(
-      { displayName: text, limit: 5 },
+      { displayName: text, limit: 15 },
       (data) => {
-        setSectionedGroupUserList([])
         setUsersObject(data)
 
       }
@@ -75,31 +55,14 @@ export default function SelectMembers({ navigation }: any) {
 
   const clearButton = () => {
     setSearchTerm('');
-    setSectionedGroupUserList([])
   };
 
   const createSectionGroup = () => {
-    // let userListForSection: SelectUserList[] = [...sectionedUserList]
-    // console.log('userListForSection:', userListForSection)
 
     const sectionUserArr =userArr.map((item) => {
     return { userId: item.userId, displayName: item.displayName as string, avatarFileId: item.avatarFileId as string }
     })
     setSectionedUserList(sectionUserArr)
-    // const groupedData: SelectUserList[] = [];
-
-    // sectionUserArr.forEach((item) => {
-    //   const existingItemIndex = groupedData.findIndex((groupedItem) => groupedItem.title === item.title);
-
-    //   if (existingItemIndex !== -1 && groupedData) {
-    //     // If the title already exists in the groupedData array, merge the data arrays
-    //     (groupedData[existingItemIndex] as Record<string, any>).data.push(...item.data);
-    //   } else {
-    //     // If the title does not exist, add the entire item to the groupedData array
-    //     groupedData.push(item);
-    //   }
-    // });
-    // setSectionedGroupUserList(groupedData)
   }
 
   useEffect(() => {
@@ -113,36 +76,9 @@ export default function SelectMembers({ navigation }: any) {
 
   }, [searchTerm])
 
-  // useEffect(() => {
-  //   const jsonData: SelectUserList[] = [
-  //     ...sectionedUserList
-  //   ];
-
-  //   const groupedData: SelectUserList[] = [];
-
-  //   jsonData.forEach((item) => {
-  //     const existingItemIndex = groupedData.findIndex((groupedItem) => groupedItem.title === item.title);
-
-  //     if (existingItemIndex !== -1 && groupedData) {
-  //       // If the title already exists in the groupedData array, merge the data arrays
-  //       (groupedData[existingItemIndex] as Record<string, any>).data.push(...item.data);
-  //     } else {
-  //       // If the title does not exist, add the entire item to the groupedData array
-  //       groupedData.push(item);
-  //     }
-  //   });
-  //   setSectionedGroupUserList(groupedData)
-
-  // }, [sectionedUserList])
-
-  const renderSectionHeader = ({ section }: { section: SelectUserList }) => (
-    <SectionHeader title={section.title} />
-  );
 
   const onUserPressed = (user: UserInterface) => {
-    console.log('user:', user)
     const isIncluded = selectedUserList.some(item => item.userId === user.userId)
-    console.log('isIncluded:', isIncluded)
     if (isIncluded) {
       const removedUser = selectedUserList.filter(item => item.userId !== user.userId)
       setSelectedUserList(removedUser)
@@ -165,30 +101,7 @@ export default function SelectMembers({ navigation }: any) {
   };
 
 
-  // const handleScroll = ({
-  //   nativeEvent,
-  // }: {
-  //   nativeEvent: NativeScrollEvent;
-  // }) => {
-  //   const { layoutMeasurement, contentOffset, contentSize } = nativeEvent;
-  //   const isEnd =
-  //     layoutMeasurement.height + contentOffset.y >= contentSize.height;
-  //   console.log('isEnd:', isEnd)
-  //   // setIsScrollEnd(isEnd);
-  // };
-  const memoizedSectionedGroupUserList = useMemo(() => {
-    const groupedData: SelectUserList[] = [...sectionedGroupUserList];
 
-    // ... your existing logic to create the groupedData ...
-
-    return groupedData;
-  }, [sectionedGroupUserList]);
-
-  // const handleOnClose = () => {
-  //   setSelectedUserList(initUserList)
-  //   onClose && onClose();
-
-  // }
   const handleLoadMore = () => {
     if (onNextPage) {
       onNextPage()
@@ -200,12 +113,6 @@ export default function SelectMembers({ navigation }: any) {
     setSelectedUserList(removedUser)
   }
 
-
-  // const onDone = () => {
-  //   onFinish && onFinish(selectedUserList)
-  //   setSelectedUserList([])
-  //   onClose && onClose()
-  // }
 
   return (
 
@@ -245,7 +152,6 @@ export default function SelectMembers({ navigation }: any) {
       <FlatList
         data={ sectionedUserList}
         renderItem={renderItem}
-        // renderSectionHeader={renderSectionHeader}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         keyExtractor={(item) => item.userId}

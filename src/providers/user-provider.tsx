@@ -1,11 +1,6 @@
 import {
-  runQuery,
-  createQuery,
-  queryUsers,
-  getUser,
-  createReport,
   UserRepository,
-} from '@amityco/ts-sdk';
+} from '@amityco/ts-sdk-react-native';
 import type { UserGroup } from '../types/user.interface';
 
 export function groupUsers(users: Amity.User[]): UserGroup[] {
@@ -36,22 +31,6 @@ export function groupUsers(users: Amity.User[]): UserGroup[] {
   return groups;
 }
 
-export async function reportUser(userId: string): Promise<boolean> {
-  return await new Promise((resolve, reject) => {
-    const query = createQuery(createReport, 'user', userId);
-
-    runQuery(query, (options) => {
-      if (options.loading == false) {
-        if (options.data !== undefined) {
-          console.log('successfully report user ');
-          return resolve(options.data);
-        } else {
-          return reject(new Error('Unable to report user ' + options.error));
-        }
-      }
-    });
-  });
-}
 
 export async function getAmityUser(userId: string): Promise<any> {
   return await new Promise((resolve, reject) => {
@@ -68,39 +47,3 @@ export async function getAmityUser(userId: string): Promise<any> {
 }
 
 
-export async function queryUser(
-  setUserListOptions: (
-    options: Amity.RunQueryOptions<typeof queryUsers>
-  ) => void,
-  nextPage = { limit: 20 },
-  displayName?: string
-): Promise<Amity.User[]> {
-  let param = {};
-  if (displayName != undefined && displayName != '') {
-    param = {
-      displayName: displayName,
-      sortBy: 'displayName',
-      page: nextPage,
-    };
-  } else {
-    param = {
-      sortBy: 'displayName',
-      page: nextPage,
-    };
-  }
-
-  return await new Promise((resolve, reject) => {
-    runQuery(createQuery(queryUsers, param), ({ data: users, ...options }) => {
-      setUserListOptions(options);
-
-      if (options.loading == false) {
-        if (users !== undefined) {
-          setUserListOptions(options);
-          return resolve(users);
-        } else {
-          return reject(new Error('Unable to get user data ' + options.error));
-        }
-      }
-    });
-  });
-}

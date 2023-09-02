@@ -3,7 +3,7 @@ import * as React from 'react';
 import {
   AmityUiKitChat,
   AmityUiKitProvider,
-} from '@amityco/asc-react-native-ui-kit';
+} from '@amityco/react-native-chat-ui-kit';
 
 export default function App() {
   return (

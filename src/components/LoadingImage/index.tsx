@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Image, Text, ActivityIndicator } from 'react-native';
+import { View, Image, Text, ActivityIndicator, StyleProp, ImageStyle } from 'react-native';
 import * as Progress from 'react-native-progress';
 import {
   uploadImageFile,
@@ -14,13 +14,16 @@ interface OverlayImageProps {
     originalPath: string
   ) => void;
   index?: number;
-  isUploaded: boolean;
+  isUploaded?: boolean;
   fileId?: string;
+  isShowSending?: boolean
+  containerStyle?: StyleProp<ImageStyle> | StyleProp<ImageStyle>;
 }
 const LoadingImage = ({
   source,
-  index,
   onLoadFinish,
+  isShowSending = true,
+  containerStyle
 }: OverlayImageProps) => {
   const [loading, setLoading] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -65,7 +68,7 @@ const LoadingImage = ({
     if (isFinish) {
       setLoading(false);
     } else {
-        uploadFileToAmity();
+      uploadFileToAmity();
     }
   }, [isFinish]);
 
@@ -75,7 +78,7 @@ const LoadingImage = ({
         <Image
           source={{ uri: source }}
           style={[
-            styles.image,
+            containerStyle?containerStyle:styles.image,
             loading ? styles.loadingImage : styles.loadedImage,
           ]}
         />
@@ -95,7 +98,7 @@ const LoadingImage = ({
         )}
 
       </View>
-      {loading && <View style={styles.loadingRow}>
+      {isShowSending && loading && <View style={styles.loadingRow}>
         <Text style={styles.loadingText}>sending</Text>
         <ActivityIndicator size={20} color={'gray'} />
       </View>}

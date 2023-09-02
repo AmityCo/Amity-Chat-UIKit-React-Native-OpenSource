@@ -1,34 +1,21 @@
-import { ChannelRepository, UserRepository } from '@amityco/ts-sdk';
-import React, { useEffect, useMemo, useState } from 'react';
+import { ChannelRepository } from '@amityco/ts-sdk-react-native';
+import React, { useEffect, useState } from 'react';
 import {
   TouchableOpacity,
   View,
   Text,
-  Modal,
-  SectionList,
-  NativeScrollEvent,
   ListRenderItemInfo,
   TextInput,
   FlatList,
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { styles } from './styles';
-import { backIcon, circleCloseIcon, closeIcon, plusIcon, searchIcon } from '../../svg/svg-xml-list';
+import { backIcon, circleCloseIcon, searchIcon } from '../../svg/svg-xml-list';
 import type { UserInterface } from '../../types/user.interface';
-
-import SectionHeader from '../../components/ListSectionHeader';
-import SelectedUserHorizontal from '../../components/SelectedUserHorizontal';
 import UserItem from '../../components/UserItem';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
 import CustomTab from '../../components/CustomTab';
-interface IModal {
-  visible: boolean;
-  userId?: string;
-  initUserList?: UserInterface[];
-  onClose?: () => void;
-  onFinish?: (users: UserInterface[]) => void;
-}
+
 export type SelectUserList = {
   title: string;
   data: UserInterface[];
@@ -36,25 +23,14 @@ export type SelectUserList = {
 
 export default function MemberDetail({ route, navigation }: any) {
   const { channelID } = route.params;
-  // const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const [sectionedGroupUserList, setSectionedGroupUserList] = useState<SelectUserList[]>([]);
-  // console.log('sectionedGroupUserList:', sectionedGroupUserList)
   const [sectionedUserList, setSectionedUserList] = useState<UserInterface[]>([]);
-  console.log('sectionedUserList:', sectionedUserList)
-  const [selectedUserList, setSelectedUserList] = useState<UserInterface[]>([]);
-  // console.log('selectedUserList:', selectedUserList)
-  // const [isScrollEnd, setIsScrollEnd] = useState(false);
+
   const [usersObject, setUsersObject] = useState<Amity.LiveCollection<Amity.Membership<"channel">>>();
   const [searchTerm, setSearchTerm] = useState('');
   const [tabIndex, setTabIndex] = useState<number>(1)
   const { data: userArr = [], onNextPage } = usersObject ?? {};
-  // console.log('userArr:', userArr)
 
 
-
-  //   useEffect(() => {
-  //  setSelectedUserList(initUserList)
-  //   }, [initUserList])
 
   const queryAccounts = (text: string = '', roles?: string[]) => {
 
@@ -83,7 +59,6 @@ export default function MemberDetail({ route, navigation }: any) {
 
   const clearButton = () => {
     setSearchTerm('');
-    setSectionedGroupUserList([])
   };
 
   const createUserList = () => {
@@ -102,7 +77,6 @@ export default function MemberDetail({ route, navigation }: any) {
     if (searchTerm.length === 0 && tabIndex ===1) {
       queryAccounts()
     }else if(searchTerm.length === 0 && tabIndex ===2){
-        console.log('pass this')
         queryAccounts('', ['channel-moderator'])
       }
 
@@ -131,23 +105,12 @@ export default function MemberDetail({ route, navigation }: any) {
     }
   }
 
-  const onDeleteUserPressed = (user: UserInterface) => {
-    const removedUser = selectedUserList.filter(item => item !== user)
-    setSelectedUserList(removedUser)
-  }
 
-
-  // const onDone = () => {
-  //   onFinish && onFinish(selectedUserList)
-  //   setSelectedUserList([])
-  //   onClose && onClose()
-  // }
   const handleGoBack = () => {
     navigation.goBack()
   }
 
   const handleTabChange = (index: number) => {
-    console.log('index:', index)
     setTabIndex(index)
 
   }
@@ -161,9 +124,6 @@ export default function MemberDetail({ route, navigation }: any) {
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerText}>Member Detail</Text>
         </View>
-        <TouchableOpacity disabled={selectedUserList.length === 0} >
-          <SvgXml xml={plusIcon} width="24" height="24" />
-        </TouchableOpacity>
       </View>
       <CustomTab tabName={['Members', 'Moderators']} onTabChange={handleTabChange} />
       <View style={styles.inputWrap}>
@@ -183,7 +143,6 @@ export default function MemberDetail({ route, navigation }: any) {
       <FlatList
         data={sectionedUserList}
         renderItem={renderItem}
-        // renderSectionHeader={renderSectionHeader}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.5}
         keyExtractor={(item) => item.userId}

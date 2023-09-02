@@ -1,12 +1,10 @@
-/* eslint-disable no-catch-shadow */
-/* eslint-disable react-hooks/exhaustive-deps */
+
 import React, { FC, useEffect, useState } from 'react';
-import { Client } from '@amityco/ts-sdk';
+import { Client } from '@amityco/ts-sdk-react-native';
 import type { AuthContextInterface } from '../types/auth.interface';
 import { Alert } from 'react-native';
 import type { IAmityUIkitProvider } from './amity-ui-kit-provider';
 
-// const apiKey = 'b3babb0b3a89f4341d31dc1a01091edcd70f8de7b23d697f';
 
 export const AuthContext = React.createContext<AuthContextInterface>({
   client: {},
@@ -37,7 +35,7 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
     apiEndpoint: { http: apiEndpoint },
   });
 
-  console.log('client:', client)
+
   const sessionHandler: Amity.SessionHandler = {
     sessionWillRenewAccessToken(renewal) {
       renewal.renew();
@@ -50,12 +48,16 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
   }, []);
 
   useEffect(() => {
-   if(sessionState === 'established'){
-    Client.startUnreadSync();
-    setIsConnected(true)
-   }
+    if (sessionState === 'established') {
+      startSync()
+      setIsConnected(true)
+    }
   }, [sessionState])
-  
+
+  const startSync = async () => {
+    const res = await Client.startUnreadSync();
+    console.log('res:', res)
+  }
 
 
   const handleConnect = async () => {
@@ -66,9 +68,9 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
       },
       sessionHandler
     );
- 
+
     if (response) {
-    console.log('response:', response)
+      console.log('response:', response)
     }
   };
 
@@ -76,7 +78,7 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
     setError('');
     setLoading(true);
     try {
-   
+
       handleConnect();
     } catch (e) {
       const errorText =

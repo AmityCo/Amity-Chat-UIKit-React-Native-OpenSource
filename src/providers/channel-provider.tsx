@@ -1,17 +1,11 @@
 import {
-  runQuery,
-  createQuery,
-  createChannel,
-  updateChannel,
-  leaveChannel,
-  queryChannelMembers,
   ChannelRepository,
-} from '@amityco/ts-sdk';
+} from '@amityco/ts-sdk-react-native';
 
 import { getAmityUser } from './user-provider';
-import { uploadFile } from './file-provider';
 import type { UserInterface } from 'src/types/user.interface';
 import { Alert } from 'react-native';
+
 
 export async function createAmityChannel(
   currentUserID: string,
@@ -55,12 +49,12 @@ export async function leaveAmityChannel(
     try {
       const didLeaveChannel = await ChannelRepository.leaveChannel(channelID);
       if(didLeaveChannel){
-        return resolve(true)
+        resolve(true)
       }
       
     } catch (error) {
       Alert.alert('Unable to leave channel due to ' + error, '', []);
-      return reject(new Error('Unable to leave channel ' + error));
+      reject(new Error('Unable to leave channel ' + error));
     }
 
   });
@@ -68,25 +62,24 @@ export async function leaveAmityChannel(
 
 export async function updateAmityChannel(
   channelID: string,
-  imagePath: string | undefined,
+  fileId: string,
   displayName: string | undefined
 ): Promise<Amity.Channel | undefined> {
   let option = {};
-  let fileId: string | undefined = undefined;
-  if (imagePath) {
-    fileId = await uploadFile(imagePath);
-  }
-  console.log('check display name ' + displayName + ' ' + imagePath);
+  console.log('displayName:', displayName)
+  console.log('fileId pass:', fileId)
+
+
   return await new Promise(async (resolve, reject) => {
-    if (imagePath && !displayName) {
+    if (fileId && !displayName) {
       option = {
         avatarFileId: fileId,
       };
-    } else if (!imagePath && displayName) {
+    } else if (!fileId && displayName) {
       option = {
         displayName: displayName,
       };
-    } else if (imagePath && displayName) {
+    } else if (fileId && displayName) {
       option = {
         displayName: displayName,
         avatarFileId: fileId,
@@ -95,62 +88,27 @@ export async function updateAmityChannel(
       return reject(
         new Error(
           'Display name and image path is missing' +
-          imagePath +
+          fileId +
           ' --- ' +
           displayName
         )
       );
     }
-    const query = createQuery(updateChannel, channelID, option);
-
-    runQuery(query, (result) => {
-      if (result.loading == false) {
-        if (result.error == undefined) {
-          console.log('update channel success ' + JSON.stringify(result.data));
-          return resolve(result.data);
-        } else {
-          return reject(new Error('Unable to create channel ' + result.error));
-        }
+    try {
+      console.log(option)
+      const {data} = await ChannelRepository.updateChannel(channelID, option);
+      console.log('updateChannel:', data)
+      if(data){
+    
+         resolve(data);
       }
-    });
+    } catch (error) {
+      reject(new Error('Unable to create channel ' + error));
+    }
+   
+
   });
 }
 
-export async function queryChannelMember(
-  setUserListOptions: (
-    options: Amity.RunQueryOptions<typeof queryChannelMembers>
-  ) => void,
-  channelID: string,
-  nextPage = { limit: 20 },
-  displayName?: string
-): Promise<Amity.Membership<'channel'>[]> {
-  let param: Amity.QueryChannelMembers = {
-    channelId: channelID,
-    memberships: ['member'],
-    sortBy: 'lastCreated',
-    page: nextPage,
-  };
-  if (displayName != undefined && displayName != '') {
-    param.search = displayName;
-  }
 
-  return await new Promise((resolve, reject) => {
-    runQuery(
-      createQuery(queryChannelMembers, param),
-      ({ data: members, ...options }) => {
-        setUserListOptions(options);
 
-        if (options.loading == false) {
-          if (members !== undefined) {
-            setUserListOptions(options);
-            return resolve(members);
-          } else {
-            return reject(
-              new Error('Unable to get user data ' + options.error)
-            );
-          }
-        }
-      }
-    );
-  });
-}
