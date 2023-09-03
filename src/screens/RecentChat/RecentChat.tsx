@@ -95,15 +95,15 @@ export default function RecentChat() {
   }
 
   useEffect(() => {
-    setTimeout(() => {
-      startSync()
-    }, 700);
-    setTimeout(() => {
-      onQueryChannel();
-    }, 1000);
-
-
-
+    if(isConnected){
+      setTimeout(() => {
+        startSync()
+      }, 750);
+      setTimeout(() => {
+        onQueryChannel();
+      }, 1500);
+    }
+ 
     return () => {
       disposers.forEach(fn => fn());
     };
