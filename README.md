@@ -5,9 +5,10 @@
   ** This is the beta version. The repo will be updated frequently. Please keep in touch **
 </div>
 <div align="center">
- <img width="250" alt="Screenshot_2566-07-24_at_19 16 20-removebg-preview" src="https://github.com/AmityCo/Amity-Social-UIKit-React-Native-OpenSource/assets/112688936/ce60425f-b478-408b-88c3-341d00263760">
- <img width="286" alt="Screenshot_2566-07-24_at_19 16 20-removebg-preview" src="https://github.com/AmityCo/Amity-Social-UIKit-React-Native-OpenSource/assets/112688936/843d3dc7-094f-4e29-812b-9fc864a96c14">
+ <img width="320" alt="Screenshot_2566-07-24_at_19 16 20-removebg-preview" src="https://github.com/AmityCo/Amity-Chat-UIKit-React-Native-OpenSource/assets/112688936/f215ec74-507f-4c44-bada-df50343aee25">
+ <img width="260" height="535" alt="Screenshot_2566-07-24_at_19 16 20-removebg-preview" src="https://github.com/AmityCo/Amity-Chat-UIKit-React-Native-OpenSource/assets/112688936/e42f3aff-09a5-4f3e-9529-a5bc7e45f177">
 </div>
+
 
 ## Getting started
 Our AmityChatUIKit include user interfaces to enable fast integration of standard Amity Chat features into new or existing applications. Furthermore, our React Native UIKit supports integration with both **Expo** and **React Native CLI**, providing you with a flexible experience to seamlessly integrate chat features into your existing React Native application.
