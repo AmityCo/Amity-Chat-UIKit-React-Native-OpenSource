@@ -4,13 +4,16 @@ import * as React from 'react';
 
 import { View, TouchableHighlight, Image } from 'react-native';
 
-import { createQuery, runQuery, queryChannelMembers } from '@amityco/ts-sdk';
+import { ChannelRepository } from '@amityco/ts-sdk-react-native';
 import CustomText from '../CustomText';
 import styles from './styles';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
+import type { UserInterface } from '../../types/user.interface';
+import { SvgXml } from 'react-native-svg';
+import { communityChatIcon, privateChatIcon } from '../../svg/svg-xml-list';
 
 export interface IChatListProps {
   chatId: string;
@@ -21,15 +24,11 @@ export interface IChatListProps {
   channelType: 'conversation' | 'broadcast' | 'live' | 'community' | '';
   avatarFileId: string | undefined;
 }
-export interface IUserObject {
-  userId: string;
-  displayName: string;
-  avatarFileId: string;
-}
+
 export interface IGroupChatObject {
   displayName: string;
   memberCount: number;
-  users: IUserObject[];
+  users: UserInterface[];
   avatarFileId: string | undefined;
 }
 const ChatList: React.FC<IChatListProps> = ({
@@ -54,17 +53,18 @@ const ChatList: React.FC<IChatListProps> = ({
     chatMemberNumber: number
   ) => {
     console.log('type:' + channelType);
-    const query = createQuery(queryChannelMembers, {
-      channelId: channelId,
-    });
 
-    runQuery(query, ({ data: members }) => {
-      if (chatMemberNumber === 2 && members) {
-        setOneOnOneChatObject(members);
-      } else if (members) {
-        setGroupChatObject(members);
-      }
-    });
+    ChannelRepository.Membership.getMembers(
+      { channelId },
+      ({ data: members }) => {
+        if (chatMemberNumber === 2 && members) {
+          setOneOnOneChatObject(members);
+        } else if (members) {
+          setGroupChatObject(members);
+        }
+      },
+    );
+
   };
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const ChatList: React.FC<IChatListProps> = ({
       const targetIndex: number = oneOnOneChatObject?.findIndex(
         (item) => item.userId !== (client as Amity.Client).userId
       );
-      const chatReceiver: IUserObject = {
+      const chatReceiver: UserInterface = {
         userId: oneOnOneChatObject[targetIndex]?.userId as string,
         displayName: oneOnOneChatObject[targetIndex]?.user
           ?.displayName as string,
@@ -90,7 +90,7 @@ const ChatList: React.FC<IChatListProps> = ({
 
   useEffect(() => {
     if (groupChatObject) {
-      const userArr: IUserObject[] = groupChatObject?.map((item) => {
+      const userArr: UserInterface[] = groupChatObject?.map((item) => {
         return {
           userId: item.userId as string,
           displayName: item.user?.displayName as string,
@@ -121,12 +121,18 @@ const ChatList: React.FC<IChatListProps> = ({
     >
       <View style={styles.chatCard}>
         <View style={styles.avatarSection}>
-          <View style={styles.icon}>
-            <Image
-              style={styles.avatar}
-              source={require('../../../assets/icon/Placeholder.png')}
-            />
-          </View>
+          {avatarFileId ? <Image
+            style={styles.icon}
+            source={
+              {
+                uri: `https://api.amity.co/api/v3/files/${avatarFileId}/download?size=small`,
+              }
+            }
+          /> : <View style={styles.icon}>
+            {channelType === 'community' ? <SvgXml xml={communityChatIcon} width={24} height={24} /> : <SvgXml xml={privateChatIcon} width={24} height={24} />}
+
+          </View>}
+
         </View>
 
         <View style={styles.chatDetailSection}>

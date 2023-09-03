@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Dimensions, StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
   container: {
@@ -19,7 +19,7 @@ const styles = StyleSheet.create({
   userBubble: {
     alignSelf: 'flex-end',
     backgroundColor: '#1054DE',
-    maxWidth: '70%',
+    maxWidth: '90%',
   },
   userImageBubble: {
     alignSelf: 'flex-end',
@@ -28,6 +28,7 @@ const styles = StyleSheet.create({
   friendBubble: {
     alignSelf: 'flex-start',
     backgroundColor: '#EBECEF',
+    maxWidth: '90%'
   },
   chatUserText: {
     fontSize: 16,
@@ -151,8 +152,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   imageMessage: {
-    width: 120,
-    height: 120,
+    resizeMode: 'cover',
+    maxWidth: 350,
+    maxHeight: 220,
+    width:   Dimensions.get('window').width /2,
+    height: Dimensions.get('window').width /3,
     borderRadius: 10,
   },
   avatarImage: {
@@ -175,6 +179,24 @@ const styles = StyleSheet.create({
   loadingText: {
     marginRight: 13,
   },
+  loadingImage:{
+    flexDirection: 'row',
+    justifyContent: 'flex-end'
+  },
+  bubbleDivider:{
+    borderBottomColor: '#EBECEF',
+    borderBottomWidth: 1,
+    borderRadius: 20,
+  },
+  textDivider:{
+    backgroundColor: '#EBECEF',
+    borderRadius: 50,
+    alignSelf: 'center',
+    paddingHorizontal: 12,
+    paddingVertical:3,
+    marginBottom: 6,
+
+  }
 });
 
 export default styles;

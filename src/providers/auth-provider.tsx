@@ -1,25 +1,19 @@
-/* eslint-disable no-catch-shadow */
-/* eslint-disable react-hooks/exhaustive-deps */
+
 import React, { FC, useEffect, useState } from 'react';
-import {
-  createClient,
-  connectClient,
-  disconnectClient,
-  enableCache,
-} from '@amityco/ts-sdk';
+import { Client } from '@amityco/ts-sdk-react-native';
 import type { AuthContextInterface } from '../types/auth.interface';
 import { Alert } from 'react-native';
 import type { IAmityUIkitProvider } from './amity-ui-kit-provider';
 
-// const apiKey = 'b3babb0b3a89f4341d31dc1a01091edcd70f8de7b23d697f';
 
 export const AuthContext = React.createContext<AuthContextInterface>({
   client: {},
   isConnecting: false,
   error: '',
-  login: () => {},
-  logout: () => {},
+  login: () => { },
+  logout: () => { },
   isConnected: false,
+  sessionState: ''
 });
 
 export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
@@ -27,14 +21,20 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
   displayName,
   apiKey,
   apiRegion,
+  apiEndpoint,
   children,
 }: IAmityUIkitProvider) => {
   const [error, setError] = useState('');
   const [isConnecting, setLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
+  const [sessionState, setSessionState] = useState('');
+  console.log('sessionState:', sessionState)
+  console.log('isConnected:', isConnected)
 
-  const client = createClient(apiKey, apiRegion);
-  enableCache();
+  const client: Amity.Client = Client.createClient(apiKey, apiRegion, {
+    apiEndpoint: { http: apiEndpoint },
+  });
+
 
   const sessionHandler: Amity.SessionHandler = {
     sessionWillRenewAccessToken(renewal) {
@@ -42,13 +42,35 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
     },
   };
 
+
+  useEffect(() => {
+    return Client.onSessionStateChange((state: Amity.SessionStates) => setSessionState(state));
+  }, []);
+
+  useEffect(() => {
+    if (sessionState === 'established') {
+      startSync()
+      setIsConnected(true)
+    }
+  }, [sessionState])
+
+  const startSync = async () => {
+    const res = await Client.startUnreadSync();
+    console.log('res:', res)
+  }
+
+
   const handleConnect = async () => {
-    try {
-      const res = await connectClient({ userId, displayName }, sessionHandler);
-      console.log('res: ', res);
-      setIsConnected(res);
-    } catch (error) {
-      console.log('error: ', error);
+    const response = await Client.login(
+      {
+        userId: userId,
+        displayName: displayName, // optional
+      },
+      sessionHandler
+    );
+
+    if (response) {
+      console.log('response:', response)
     }
   };
 
@@ -56,6 +78,7 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
     setError('');
     setLoading(true);
     try {
+
       handleConnect();
     } catch (e) {
       const errorText =
@@ -74,7 +97,8 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
   // TODO
   const logout = async () => {
     try {
-      await disconnectClient();
+      Client.stopUnreadSync();
+      await Client.logout();
     } catch (e) {
       const errorText =
         (e as Error)?.message ?? 'Error while handling request!';
@@ -82,7 +106,6 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
       Alert.alert(errorText);
     }
   };
-
 
   return (
     <AuthContext.Provider
@@ -93,6 +116,7 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
         client,
         logout,
         isConnected,
+        sessionState
       }}
     >
       {children}

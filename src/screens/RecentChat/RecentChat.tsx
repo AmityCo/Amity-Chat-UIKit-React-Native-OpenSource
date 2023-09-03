@@ -1,4 +1,4 @@
-import React, { ReactElement, useCallback, useRef } from 'react';
+import React, { ReactElement, useMemo, useRef } from 'react';
 
 import {
   View,
@@ -8,8 +8,8 @@ import {
   SafeAreaView,
 } from 'react-native';
 
-import { liveChannels } from '@amityco/ts-sdk';
-import ChatList, { IChatListProps } from '../../components/ChatList/index';
+import { ChannelRepository, getChannelTopic, subscribeTopic } from '@amityco/ts-sdk-react-native';
+import ChatList, { IChatListProps, IGroupChatObject } from '../../components/ChatList/index';
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
@@ -18,36 +18,54 @@ import styles from './styles';
 import CustomText from '../../components/CustomText';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import { Client } from '@amityco/ts-sdk-react-native'
 import LoadingIndicator from '../../components/LoadingIndicator/index';
+import AddMembersModal from '../../components/AddMembersModal';
+import type { UserInterface } from '../../types/user.interface';
+import { createAmityChannel } from '../../providers/channel-provider';
+
 export default function RecentChat() {
-  const { isConnected } = useAuth();
+  const { client, isConnected } = useAuth();
 
   const [channelObjects, setChannelObjects] = useState<IChatListProps[]>([]);
   const [loadChannel, setLoadChannel] = useState<boolean>(true);
-  // const [unSubFunc, setUnSubFunc] = useState<any>();
+  const [isModalVisible, setIsModalVisible] = useState(false)
+
 
   const flatListRef = useRef(null);
 
-  const [channelData, setChannelData] =
-    useState<Amity.LiveCollection<Amity.Channel>>();
+  const [channelData, setChannelData] = useState<Amity.LiveCollection<Amity.Channel>>();
+
 
   const {
     data: channels = [],
     onNextPage,
     hasNextPage,
-    // loading,
-    // error,
+
   } = channelData ?? {};
+  const disposers: Amity.Unsubscriber[] = [];
+  const subscribedChannels: Amity.Channel['channelId'][] = [];
+
+  const subscribeChannels = (channels: Amity.Channel[]) =>
+    channels.forEach(c => {
+      if (!subscribedChannels.includes(c.channelId) && !c.isDeleted) {
+        subscribedChannels.push(c.channelId);
+
+        disposers.push(subscribeTopic(getChannelTopic(c)));
+      }
+    });
+
+
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+
   navigation.setOptions({
-    // eslint-disable-next-line react/no-unstable-nested-components
+
     header: () => (
       <SafeAreaView style={styles.topBar}>
         <CustomText style={styles.titleText}>Chat</CustomText>
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('SelectMembers');
+            setIsModalVisible(true)
           }}
         >
           <Image
@@ -60,20 +78,38 @@ export default function RecentChat() {
     headerTitle: '',
   });
 
+
   const onQueryChannel = () => {
-    liveChannels(
-      { limit: 10, membership: 'member', sortBy: 'lastActivity' },
+    const unsubscribe = ChannelRepository.getChannels(
+      { sortBy: 'lastActivity', limit: 10, membership: 'member' },
       (value) => {
         setChannelData(value);
-      }
+        subscribeChannels(channels);
+      },
     );
-    // setUnSubFunc(() => unSubScribe);
+    disposers.push(unsubscribe);
   };
+  const startSync = async () => {
+    const res = await Client.startUnreadSync();
+    console.log('res:', res)
+  }
+
   useEffect(() => {
-    if (isConnected) {
-      onQueryChannel();
+    if(isConnected){
+      setTimeout(() => {
+        startSync()
+      }, 750);
+      setTimeout(() => {
+        onQueryChannel();
+      }, 1500);
     }
+ 
+    return () => {
+      disposers.forEach(fn => fn());
+    };
   }, [isConnected]);
+
+
   useEffect(() => {
     if (channels.length > 0) {
       const formattedChannelObjects: IChatListProps[] = channels.map(
@@ -103,33 +139,86 @@ export default function RecentChat() {
       setChannelObjects([...formattedChannelObjects]);
       setLoadChannel(false);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelData]);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const handleLoadMore = () => {
     if (hasNextPage && onNextPage) {
       onNextPage();
     }
   };
 
-  const renderRecentChat = useCallback((): ReactElement => {
+  const handleCloseModal = () => {
+    setIsModalVisible(false)
+  }
+
+  const handleOnFinish = async (users: UserInterface[]) => {
+    const channel = await createAmityChannel((client as Amity.Client).userId as string, users)
+    if (channel) {
+      try {
+        if (users.length === 1 && users[0]) {
+          const oneOnOneChatObject: UserInterface = {
+            userId: users[0].userId,
+            displayName: users[0].displayName as string,
+            avatarFileId: users[0].avatarFileId as string,
+          };
+
+          navigation.navigate('ChatRoom', {
+            channelId: channel.channelId,
+            chatReceiver: oneOnOneChatObject,
+          });
+
+        } else if (users.length > 1) {
+          const chatDisplayName = users.map(
+            (item) => item.displayName
+          );
+          const userObject = users.map((item: UserInterface) => {
+            return {
+              userId: item.userId,
+              displayName: item.displayName,
+              avatarFileId: item.avatarFileId,
+            };
+          });
+          const groupChatObject: IGroupChatObject = {
+            displayName: chatDisplayName.join(','),
+            users: userObject,
+            memberCount: channel.memberCount as number,
+            avatarFileId: channel.avatarFileId
+          };
+          console.log('groupChatObject: ', groupChatObject);
+
+
+          navigation.navigate('ChatRoom', {
+            channelId: channel.channelId,
+            groupChat: groupChatObject,
+          });
+
+        }
+
+        console.log('create chat success ' + JSON.stringify(channel));
+      } catch (error) {
+        console.log('create chat error ' + JSON.stringify(error));
+        console.error(error);
+      }
+
+    }
+  }
+  const renderRecentChat = useMemo(() => {
     return loadChannel ? (
-      // eslint-disable-next-line react-native/no-inline-styles
       <View style={{ marginTop: 20 }}>
         <LoadingIndicator />
       </View>
     ) : (
-      <FlatList
-        data={channelObjects}
-        renderItem={({ item }) => renderChatList(item)}
-        keyExtractor={(item) => item.chatId.toString()}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.5}
-        ref={flatListRef}
-        // eslint-disable-next-line react-native/no-inline-styles
-        contentContainerStyle={{ flexGrow: 1 }}
-      />
+      <View>
+        <FlatList
+          data={channelObjects}
+          renderItem={({ item }) => renderChatList(item)}
+          keyExtractor={(item) => item.chatId.toString()}
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.3}
+          ref={flatListRef}
+          contentContainerStyle={{ flexGrow: 1 }}
+        />
+      </View>
     );
   }, [loadChannel, channelObjects, handleLoadMore]);
   const renderChatList = (item: IChatListProps): ReactElement => {
@@ -157,9 +246,10 @@ export default function RecentChat() {
   };
 
   return (
-    <View>
+    <View style={styles.chatContainer}>
       {renderTabView()}
-      {renderRecentChat()}
+      {renderRecentChat}
+      <AddMembersModal onFinish={handleOnFinish} onClose={handleCloseModal} visible={isModalVisible} />
     </View>
   );
 }

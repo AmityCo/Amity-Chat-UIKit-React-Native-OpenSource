@@ -1,21 +1,28 @@
 import React, { useRef, useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './styles';
+import type { UserInterface } from '../../types/user.interface';
 
 const maxLength = 10;
-const displayName = (user: Amity.User) => {
-  if (user.displayName!.length > maxLength) {
-    return user.displayName!.substring(0, maxLength) + '..';
+const displayName = (user: UserInterface) => {
+  if (user.displayName) {
+    if (user.displayName!.length > maxLength) {
+      return user.displayName!.substring(0, maxLength) + '..';
+    }
+    return user.displayName!;
   }
-  return user.displayName!;
+  return 'Display name';
 };
 const AvatarListItem = ({
   user,
   onDelete,
 }: {
-  user: Amity.User;
+  user: UserInterface;
   onDelete: () => void;
 }) => {
+  const avatarFileURL = (fileId: string) => {
+    return `https://api.amity.co/api/v3/files/${fileId}/download?size=medium`;
+  };
   return (
     <View style={styles.avatarContainer}>
       <View style={styles.avatar}>
@@ -23,8 +30,8 @@ const AvatarListItem = ({
           <Image
             style={styles.avatarImage}
             source={
-              user.avatarCustomUrl
-                ? { uri: user.avatarCustomUrl }
+              user.avatarFileId
+                ? { uri: avatarFileURL(user.avatarFileId) }
                 : require('../../../assets/icon/Placeholder.png')
             }
           />
@@ -42,8 +49,8 @@ export default function SelectedUserHorizontal({
   users,
   onDeleteUserPressed,
 }: {
-  users: Amity.User[];
-  onDeleteUserPressed: (user: Amity.User) => void;
+  users: UserInterface[];
+  onDeleteUserPressed: (user: UserInterface) => void;
 }) {
   const [scrollOffset, setScrollOffset] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);

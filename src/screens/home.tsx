@@ -12,17 +12,11 @@ export default function Home({ navigation }: any) {
   console.log('client: ', client);
 
   const clickLogin = () => {
-    // console.log('pass');
-    // console.log('client: ', client.useId);
-    // login({ userId: inputText || 'top', displayName: inputText || 'top' });
   };
   const clickChatDetail = () => {
     navigation.navigate('ChatDetail');
   };
   const checkLogin = () => {
-    console.log('pass22');
-    console.log('client: ', isConnecting);
-    console.log('client: ', client);
 
     if (
       (client as Amity.Client).sessionState ===
@@ -44,9 +38,6 @@ export default function Home({ navigation }: any) {
     }
   };
   const chatRoom = () => {
-    console.log('pass2');
-    // console.log('client: ', typeof client.sessionState);
-    console.log('client: ', client);
 
     if (
       (client as Amity.Client).sessionState ===
@@ -60,11 +51,7 @@ export default function Home({ navigation }: any) {
   const [inputText, setInputText] = useState<string>('');
   return (
     <View>
-      {/* <Text>{t('first')}</Text>
-      <Text>{t('second')}</Text>
-      <Text>
-{t('second')}</Text>
-      <Text>{t('second')}</Text> */}
+
       <Button title="Login" onPress={clickLogin} />
       <Button title="Recent Chat" onPress={checkLogin2} />
 
