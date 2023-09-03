@@ -6,7 +6,7 @@
 </div>
 <div align="center">
  <img width="320" alt="Screenshot_2566-07-24_at_19 16 20-removebg-preview" src="https://github.com/AmityCo/Amity-Chat-UIKit-React-Native-OpenSource/assets/112688936/f215ec74-507f-4c44-bada-df50343aee25">
- <img width="260" height="535" alt="Screenshot_2566-07-24_at_19 16 20-removebg-preview" src="https://github.com/AmityCo/Amity-Chat-UIKit-React-Native-OpenSource/assets/112688936/e42f3aff-09a5-4f3e-9529-a5bc7e45f177">
+ <img width="260" height="528" alt="Screenshot_2566-07-24_at_19 16 20-removebg-preview" src="https://github.com/AmityCo/Amity-Chat-UIKit-React-Native-OpenSource/assets/112688936/e42f3aff-09a5-4f3e-9529-a5bc7e45f177">
 </div>
 
 
