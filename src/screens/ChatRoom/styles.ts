@@ -12,6 +12,11 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     padding: 10,
   },
+  deletedMessageContainer: {
+    alignSelf: 'flex-start',
+    borderRadius: 10,
+    marginVertical: 15,
+  },
   imageChatBubble: {
     marginVertical: 5,
     borderRadius: 10,
@@ -19,7 +24,16 @@ const styles = StyleSheet.create({
   userBubble: {
     alignSelf: 'flex-end',
     backgroundColor: '#1054DE',
-    maxWidth: '90%',
+    maxWidth: '100%',
+    marginLeft: 60
+  },
+  userMessageDelete: {
+    alignSelf: 'flex-end',
+    maxWidth: '100%',
+  },
+  friendMessageDelete: {
+    alignSelf: 'flex-start',
+    maxWidth: '100%',
   },
   userImageBubble: {
     alignSelf: 'flex-end',
@@ -28,7 +42,8 @@ const styles = StyleSheet.create({
   friendBubble: {
     alignSelf: 'flex-start',
     backgroundColor: '#EBECEF',
-    maxWidth: '90%'
+    maxWidth: '100%',
+    marginRight: 60
   },
   chatUserText: {
     fontSize: 16,
@@ -37,6 +52,14 @@ const styles = StyleSheet.create({
   chatFriendText: {
     fontSize: 16,
     color: 'black',
+  },
+  deletedMessage:{
+    color: '#898E9E',
+    marginLeft: 5
+  },
+  deletedMessageRow:{
+    flexDirection:'row',
+    alignItems: 'center'
   },
   chatTimestamp: {
     fontSize: 13,
@@ -196,7 +219,16 @@ const styles = StyleSheet.create({
     paddingVertical:3,
     marginBottom: 6,
 
-  }
+  },
+  
+    optionsContainer: {
+    backgroundColor: 'white', // Change the background color
+    borderRadius: 10, // Add rounded corners
+    padding: 10, // Add padding around the options container
+    width: 80, // Set the width of the options container
+    marginTop: -50, // Adjust the top margin as needed
+  },
+
 });
 
 export default styles;
