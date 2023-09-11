@@ -175,13 +175,20 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
         }
       );
     }
+    return ()=>{
+      disposers.forEach((fn) => fn());
+      stopRead()
+    }
   }, [channelId]);
 
   const startRead = async () => {
     await SubChannelRepository.startReading(channelId);
 
   };
+  const stopRead = async () => {
+    await SubChannelRepository.stopReading(channelId);
 
+  };
   useEffect(() => {
     if (subChannelData && channelId) {
       startRead()
@@ -277,6 +284,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
   function handleBack(): void {
     disposers.forEach((fn) => fn());
+    stopRead()
   }
 
   const loadNextMessages = () => {
