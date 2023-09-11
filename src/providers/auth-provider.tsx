@@ -47,17 +47,20 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
     return Client.onSessionStateChange((state: Amity.SessionStates) => setSessionState(state));
   }, []);
 
+  const startSync = async () => {
+    await Client.startUnreadSync();
+  }
+
   useEffect(() => {
+
     if (sessionState === 'established') {
-      startSync()
-      setIsConnected(true)
+
+      startSync().then(() => {
+        setIsConnected(true)
+      });
+
     }
   }, [sessionState])
-
-  const startSync = async () => {
-    const res = await Client.startUnreadSync();
-    console.log('res:', res)
-  }
 
 
   const handleConnect = async () => {
