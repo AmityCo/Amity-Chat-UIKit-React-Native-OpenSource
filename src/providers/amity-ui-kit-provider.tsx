@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 import AuthContextProvider from './auth-provider';
-
+import { MenuProvider } from 'react-native-popup-menu';
 export interface IAmityUIkitProvider {
   userId: string;
   displayName: string;
@@ -26,7 +26,9 @@ export default function AmityUiKitProvider({
       apiRegion={apiRegion}
       apiEndpoint={apiEndpoint}
     >
-      {children}
+      <MenuProvider>
+        {children}
+      </MenuProvider>
     </AuthContextProvider>
   );
 }

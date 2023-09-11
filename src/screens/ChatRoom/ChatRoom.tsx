@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react-native/no-inline-styles */
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
 import {
   View,
   Image,
@@ -12,6 +12,7 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Keyboard,
+  Alert,
 } from 'react-native';
 import ImageView from 'react-native-image-viewing';
 import CustomText from '../../components/CustomText';
@@ -33,6 +34,15 @@ import useAuth from '../../hooks/useAuth';
 import * as ImagePicker from 'expo-image-picker';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import LoadingImage from '../../components/LoadingImage';
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from "react-native-popup-menu";
+import { SvgXml } from 'react-native-svg';
+import { deletedIcon } from '../../svg/svg-xml-list';
+
 type ChatRoomScreenComponentType = React.FC<{
   route: RouteProp<RootStackParamList, 'ChatRoom'>;
   navigation: StackNavigationProp<RootStackParamList, 'ChatRoom'>;
@@ -52,6 +62,7 @@ interface IMessage {
   image?: string;
   messageType: string;
   isPending?: boolean;
+  isDeleted: boolean;
 }
 export interface IDisplayImage {
   url: string;
@@ -137,7 +148,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           </View>
           <TouchableOpacity
             onPress={() => {
-              navigation.navigate('ChatDetail', { channelId: channelId, channelType: chatReceiver?'conversation': 'community', chatReceiver: chatReceiver ?? undefined , groupChat: groupChat?? undefined});
+              navigation.navigate('ChatDetail', { channelId: channelId, channelType: chatReceiver ? 'conversation' : 'community', chatReceiver: chatReceiver ?? undefined, groupChat: groupChat ?? undefined });
             }}
           >
             <Image
@@ -175,7 +186,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     if (subChannelData && channelId) {
       startRead()
       const unsubscribe = MessageRepository.getMessages(
-        { subChannelId: channelId, limit: 10 },
+        { subChannelId: channelId, limit: 10, includeDeleted: true },
         (value) => {
           setMessagesData(value);
           subscribeSubChannel(subChannelData as Amity.SubChannel);
@@ -221,6 +232,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               avatar: avatarUrl,
             },
             messageType: item.dataType,
+            isDeleted: item.isDeleted as boolean
           };
         } else {
           return {
@@ -234,6 +246,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               avatar: avatarUrl,
             },
             messageType: item.dataType,
+            isDeleted: item.isDeleted as boolean
           };
         }
       });
@@ -280,10 +293,14 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     setSortedMessages([...reOrderArr]);
   }, [messages]);
 
-  const openFullImage = (image: string) => {
-    const fullSizeImage: string = image + '?size=full';
-    setFullImage(fullSizeImage);
-    setIsVisibleFullImage(true);
+  const openFullImage = (image: string, messageType: string) => {
+    console.log('messageType:', messageType)
+    if (messageType === 'image' || messageType === 'file') {
+      const fullSizeImage: string = image + '?size=full';
+      setFullImage(fullSizeImage);
+      setIsVisibleFullImage(true);
+    }
+
   };
   const renderTimeDivider = (date: Date) => {
     const currentDate = date;
@@ -307,6 +324,19 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     );
   };
 
+  const deleteMessage = async (messageId: string) => {
+    const message = await MessageRepository.softDeleteMessage(messageId);
+    return message
+
+  }
+
+  const reportMessage = async (messageId: string) => {
+    const isFlagged = await MessageRepository.flagMessage(messageId);
+    if (isFlagged) {
+      Alert.alert('Report sent ✅')
+    }
+
+  }
   const renderChatMessages = (message: IMessage, index: number) => {
 
     const isUserChat: boolean =
@@ -321,6 +351,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
       isRenderDivider = true
     }
     return (
+
       <View>
         {isRenderDivider && renderTimeDivider(message.createdAt as Date)}
         <View
@@ -345,38 +376,59 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
                 {message.user.name}
               </Text>
             )}
-
-            {message.messageType === 'text' ? (
-              <View
-                key={message._id}
-                style={[
-                  styles.textChatBubble,
-                  isUserChat ? styles.userBubble : styles.friendBubble,
-                ]}
-              >
-                <Text
-                  style={isUserChat ? styles.chatUserText : styles.chatFriendText}
-                >
-                  {message.text}
-                </Text>
+            {message.isDeleted ?
+              <View style={[
+                styles.deletedMessageContainer,
+                isUserChat ? styles.userMessageDelete : styles.friendMessageDelete,
+              ]}>
+                <View style={styles.deletedMessageRow}>
+                  <SvgXml xml={deletedIcon} width={20} height={20} />
+                  <Text style={styles.deletedMessage}>Message Deleted</Text>
+                </View>
               </View>
-            ) : (
-              <TouchableOpacity
-                style={[
-                  styles.imageChatBubble,
-                  isUserChat ? styles.userImageBubble : styles.friendBubble,
-                ]}
-                onPress={() => openFullImage(message.image as string)}
-              >
 
-                <Image
-                  style={styles.imageMessage}
-                  source={{
-                    uri: message.image + '?size=medium',
-                  }}
-                />
-              </TouchableOpacity>
-            )}
+              : <Menu>
+                <MenuTrigger onAlternativeAction={() => openFullImage(message.image as string, message.messageType)} customStyles={{ triggerTouchable: { underlayColor: 'transparent' } }} triggerOnLongPress>
+                  {message.messageType === 'text' ? (
+                    <View
+                      key={message._id}
+                      style={[
+                        styles.textChatBubble,
+                        isUserChat ? styles.userBubble : styles.friendBubble,
+                      ]}
+                    >
+                      <Text
+                        style={isUserChat ? styles.chatUserText : styles.chatFriendText}
+                      >
+                        {message.text}
+                      </Text>
+                    </View>
+                  ) : (
+                    <View
+                      style={[
+                        styles.imageChatBubble,
+                        isUserChat ? styles.userImageBubble : styles.friendBubble,
+                      ]}
+                    >
+
+                      <Image
+                        style={styles.imageMessage}
+                        source={{
+                          uri: message.image + '?size=medium',
+                        }}
+                      />
+                    </View>
+                  )}
+                </MenuTrigger>
+                <MenuOptions customStyles={{ optionsContainer: { ...styles.optionsContainer, marginLeft: isUserChat ? 240+ ((message.text && message.text.length<5)? message.text.length*10: 10): 0 } }}>
+                  {isUserChat ? <MenuOption onSelect={() => Alert.alert('Delete thsi message?', `Message will be also be permanently removed from your friend's devices.`, [
+                    { text: 'Cancel', style: 'cancel' },
+                    { text: 'Delete', style: 'destructive', onPress: () => deleteMessage(message._id) },
+                  ])} text="Delete" /> : <MenuOption onSelect={() => reportMessage(message._id)} text="Report" />}
+
+                </MenuOptions>
+
+              </Menu>}
 
             <Text
               style={[
@@ -393,6 +445,8 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           </View>
         </View>
       </View>
+
+
     );
   };
   const handlePress = () => {
@@ -536,6 +590,8 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   }, [displayImages, handleOnFinishImage]);
 
   return (
+
+
     <View style={styles.container}>
       <View style={styles.chatContainer}>
         <FlatList
@@ -622,6 +678,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
         onRequestClose={() => setIsVisibleFullImage(false)}
       />
     </View>
+
   );
 };
 export default ChatRoom;
