@@ -90,8 +90,8 @@ export default function RecentChat() {
     disposers.push(unsubscribe);
   };
   const startSync = async () => {
-    const res = await Client.startUnreadSync();
-    console.log('res:', res)
+    await Client.startUnreadSync();
+
   }
 
   useEffect(() => {
@@ -221,7 +221,7 @@ export default function RecentChat() {
       </View>
     );
   }, [loadChannel, channelObjects, handleLoadMore]);
-  const renderChatList = (item: IChatListProps): ReactElement => {
+  const  renderChatList = (item: IChatListProps): ReactElement => {
     return (
       <ChatList
         key={item.chatId}

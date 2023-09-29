@@ -28,8 +28,6 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
   const [isConnecting, setLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
   const [sessionState, setSessionState] = useState('');
-  console.log('sessionState:', sessionState)
-  console.log('isConnected:', isConnected)
 
   const client: Amity.Client = Client.createClient(apiKey, apiRegion, {
     apiEndpoint: { http: apiEndpoint },

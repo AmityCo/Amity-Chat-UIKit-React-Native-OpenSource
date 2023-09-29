@@ -78,13 +78,11 @@ const ChatList: React.FC<IChatListProps> = ({
           ?.displayName as string,
         avatarFileId: oneOnOneChatObject[targetIndex]?.user?.avatarFileId ?? '',
       };
-      console.log('chatReceiver: ', chatReceiver);
 
       navigation.navigate('ChatRoom', {
         channelId: chatId,
         chatReceiver: chatReceiver,
       });
-      console.log('chatId: ', chatId);
     }
   }, [oneOnOneChatObject]);
 
@@ -104,7 +102,6 @@ const ChatList: React.FC<IChatListProps> = ({
         avatarFileId: avatarFileId,
         memberCount: chatMemberNumber,
       };
-      console.log('group====>: ', groupChat);
       navigation.navigate('ChatRoom', {
         channelId: chatId,
         groupChat: groupChat,

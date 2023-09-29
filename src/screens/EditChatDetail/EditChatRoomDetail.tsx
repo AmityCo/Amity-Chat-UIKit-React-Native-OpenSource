@@ -61,15 +61,12 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
         uploadedFileId as string,
         displayName
       );
-      console.log('result:', result)
       if (result) {
 
         setShowLoadingIndicator(false);
         navigation.goBack();
       }
-      console.log('Update chat success ' + JSON.stringify(result));
     } catch (error) {
-      console.log('Update chat error ' + JSON.stringify(error));
       console.error(error);
     }
   };
@@ -86,8 +83,6 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
           quality: 1,
         });
 
-      console.log(result);
-      // console.log('result: ', result);
       if (
         result.assets &&
         result.assets.length > 0 &&
@@ -154,7 +149,6 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
   const handleOnFinishImage = async (
     fileId: string,
   ) => {
-    console.log('fileId:', fileId)
     setUploadedFileId(fileId)
 
 

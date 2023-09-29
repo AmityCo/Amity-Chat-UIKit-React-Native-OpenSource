@@ -8,9 +8,7 @@ import useAuth from '../hooks/useAuth';
 
 export default function Home({ navigation }: any) {
   // const { t, i18n } = useTranslation();
-  const { client, isConnecting } = useAuth();
-  console.log('client: ', client);
-
+  const { client } = useAuth();
   const clickLogin = () => {
   };
   const clickChatDetail = () => {
@@ -26,9 +24,6 @@ export default function Home({ navigation }: any) {
     }
   };
   const checkLogin2 = () => {
-    console.log('pass2');
-    console.log('isConnecting: ', isConnecting);
-    console.log('client: ', client);
 
     if (
       (client as Amity.Client).sessionState ===

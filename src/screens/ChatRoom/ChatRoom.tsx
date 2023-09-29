@@ -42,6 +42,7 @@ import {
 } from "react-native-popup-menu";
 import { SvgXml } from 'react-native-svg';
 import { deletedIcon } from '../../svg/svg-xml-list';
+import EditMessageModal from '../../components/EditMessageModal';
 
 type ChatRoomScreenComponentType = React.FC<{
   route: RouteProp<RootStackParamList, 'ChatRoom'>;
@@ -53,7 +54,8 @@ LogBox.ignoreAllLogs();
 interface IMessage {
   _id: string;
   text?: string;
-  createdAt: Date;
+  createdAt: string;
+  editedAt: string;
   user: {
     _id: string;
     name: string;
@@ -95,6 +97,9 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   const [fullImage, setFullImage] = useState<string>('');
   const [subChannelData, setSubChannelData] = useState<Amity.SubChannel>();
   const [displayImages, setDisplayImages] = useState<IDisplayImage[]>([]);
+  const [editMessageModal, setEditMessageModal] = useState<boolean>(false)
+  const [editMessageId, setEditMessageId] = useState<string>('');
+  const [editMessageText, setEditMessageText] = useState<string>('');
   const disposers: Amity.Unsubscriber[] = [];
 
 
@@ -175,7 +180,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
         }
       );
     }
-    return ()=>{
+    return () => {
       disposers.forEach((fn) => fn());
       stopRead()
     }
@@ -232,7 +237,8 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
             image:
               `https://api.amity.co/api/v3/files/${(item?.data as Record<string, any>).fileId
               }/download` ?? undefined,
-            createdAt: new Date(item.createdAt),
+            createdAt: item.createdAt as string,
+            editedAt: item.updatedAt as string,
             user: {
               _id: item.creatorId ?? '',
               name: item.creatorId ?? '',
@@ -246,7 +252,8 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
             _id: item.messageId,
             text:
               ((item?.data as Record<string, string>)?.text as string) ?? '',
-            createdAt: new Date(item.createdAt),
+            createdAt: item.createdAt as string,
+            editedAt: item.updatedAt as string,
             user: {
               _id: item.creatorId ?? '',
               name: item.creatorId ?? '',
@@ -302,7 +309,6 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   }, [messages]);
 
   const openFullImage = (image: string, messageType: string) => {
-    console.log('messageType:', messageType)
     if (messageType === 'image' || messageType === 'file') {
       const fullSizeImage: string = image + '?size=full';
       setFullImage(fullSizeImage);
@@ -310,7 +316,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     }
 
   };
-  const renderTimeDivider = (date: Date) => {
+  const renderTimeDivider = (date: string) => {
     const currentDate = date;
     const formattedDate = moment(currentDate).format('MMMM DD, YYYY');
     const today = moment().startOf('day');
@@ -345,6 +351,8 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     }
 
   }
+
+
   const renderChatMessages = (message: IMessage, index: number) => {
 
     const isUserChat: boolean =
@@ -358,10 +366,11 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     if (!isSameDay || index === sortedMessages.length - 1) {
       isRenderDivider = true
     }
+
     return (
 
       <View>
-        {isRenderDivider && renderTimeDivider(message.createdAt as Date)}
+        {isRenderDivider && renderTimeDivider(message.createdAt)}
         <View
           style={!isUserChat ? styles.leftMessageWrap : styles.rightMessageWrap}
         >
@@ -428,16 +437,16 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
                     </View>
                   )}
                 </MenuTrigger>
-                <MenuOptions customStyles={{ optionsContainer: { ...styles.optionsContainer, marginLeft: isUserChat ? 240+ ((message.text && message.text.length<5)? message.text.length*10: 10): 0 } }}>
-                  {isUserChat ? <MenuOption onSelect={() => Alert.alert('Delete thsi message?', `Message will be also be permanently removed from your friend's devices.`, [
+                <MenuOptions customStyles={{ optionsContainer: { ...styles.optionsContainer, marginLeft: isUserChat ? 240 + ((message.text && message.text.length < 5) ? message.text.length * 10 : 10) : 0 } }}>
+                  {isUserChat ? <MenuOption onSelect={() => Alert.alert('Delete this message?', `Message will be also be permanently removed from your friend's devices.`, [
                     { text: 'Cancel', style: 'cancel' },
                     { text: 'Delete', style: 'destructive', onPress: () => deleteMessage(message._id) },
                   ])} text="Delete" /> : <MenuOption onSelect={() => reportMessage(message._id)} text="Report" />}
+                  {(message.messageType === 'text' && isUserChat) && <MenuOption onSelect={() => { return openEditMessageModal(message._id, message.text as string) }} text="Edit" />}
 
                 </MenuOptions>
 
               </Menu>}
-
             <Text
               style={[
                 styles.chatTimestamp,
@@ -446,7 +455,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
                 },
               ]}
             >
-              {moment(message.createdAt).format('hh:mm A')}
+              {message.createdAt != message.editedAt ? 'Edited ·' : ''} {moment(message.createdAt).format('hh:mm A')}
             </Text>
 
 
@@ -460,7 +469,6 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   const handlePress = () => {
     Keyboard.dismiss();
     setIsExpanded(!isExpanded);
-    console.log('display Imagess', displayImages)
   };
   const scrollToBottom = () => {
     if (flatListRef && flatListRef.current) {
@@ -506,7 +514,6 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
 
   const createImageMessage = async (fileId: string) => {
-    console.log('createImageMessage: trigger')
 
     if (fileId) {
 
@@ -597,6 +604,19 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     );
   }, [displayImages, handleOnFinishImage]);
 
+  const openEditMessageModal = (messageId: string, text: string) => {
+    setEditMessageId(messageId)
+    setEditMessageModal(true)
+    setEditMessageText(text)
+  }
+
+  const closeEditMessageModal = () => {
+    setEditMessageId('')
+    setEditMessageText('')
+    setEditMessageModal(false)
+  }
+
+
   return (
 
 
@@ -684,6 +704,13 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
         imageIndex={0}
         visible={visibleFullImage}
         onRequestClose={() => setIsVisibleFullImage(false)}
+      />
+      <EditMessageModal
+        visible={editMessageModal}
+        onClose={closeEditMessageModal}
+        messageText={editMessageText}
+        onFinishEdit={closeEditMessageModal}
+        messageId={editMessageId}
       />
     </View>
 

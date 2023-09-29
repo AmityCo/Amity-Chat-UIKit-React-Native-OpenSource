@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@amityco/ts-sdk-react-native@6.7.1-cafe37a.0":
-  version "6.7.1-cafe37a.0"
-  resolved "https://registry.yarnpkg.com/@amityco/ts-sdk-react-native/-/ts-sdk-react-native-6.7.1-cafe37a.0.tgz#3acf5828a2ee14bc9df483c607cba205969800fa"
-  integrity sha512-Iw/nWeLHPVrpUsC7RPRk292cAG0jZMUwj3IwWMAB474rRiegvm7WbW6L952Ntq9+k3AtWvXAWDExJsc6BwDmbg==
+"@amityco/ts-sdk-react-native@^6.8.0":
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/@amityco/ts-sdk-react-native/-/ts-sdk-react-native-6.8.0.tgz#8e146056c729aea64f4771573f9f9e1baa32c4f7"
+  integrity sha512-xq0SDabmLAsHLcXP0teYRORd0xf7qt0wUR9Vn5sDepvm2SxJD2kAat3KbVULGHxi+7MHkBS5fh8om3o8Tu6nzQ==
   dependencies:
     "@react-native-async-storage/async-storage" "^1.17.7"
     "@react-native-community/netinfo" "^9.4.1"
@@ -8969,6 +8969,11 @@ react-native-pager-view@6.1.4:
   version "6.1.4"
   resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.1.4.tgz#3a63ebd1b72f81991157ea552bb9c887e529bc8c"
   integrity sha512-fmTwgGwPxGCBusKAq7gHzm+s1Yp0qh5rKPoQszaCuxrb+76KgK4Qe82jJNPUp2xTZOKSw+FbJU2QahF8ncTl+w==
+
+react-native-popup-menu@^0.16.1:
+  version "0.16.1"
+  resolved "https://registry.yarnpkg.com/react-native-popup-menu/-/react-native-popup-menu-0.16.1.tgz#b1bb56be5c0838bbc2f532af7b1f554b7ceef566"
+  integrity sha512-xRS7mRh0exwu7Iw8PPVHdM11d13A/KzYjy0/fZx3zVtxISxPkNaDGayau6oa7HqO3Nj0oS9ulFCYjcQfG6vahA==
 
 react-native-progress@^5.0.0:
   version "5.0.0"

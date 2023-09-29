@@ -11,9 +11,7 @@ interface ChatDetailProps {
 
 export const ChatRoomSetting: React.FC<ChatDetailProps> = ({ navigation, route }) => {
     const { channelId, channelType, chatReceiver, groupChat } = route.params;
-    console.log('chatReceiver:', chatReceiver)
-    console.log('channelId:', channelId)
-    console.log('channelType:', channelType)
+
     const handleGroupProfilePress = () => {
         navigation.navigate('EditChatDetail', { navigation, channelId: channelId, groupChat: groupChat });
     };
@@ -43,7 +41,6 @@ export const ChatRoomSetting: React.FC<ChatDetailProps> = ({ navigation, route }
 
     const onLeaveChat =async ()=>{
         const isLeave = await leaveAmityChannel(channelId)
-        console.log('isLeave:', isLeave)
         if(isLeave){
             navigation.navigate('RecentChat')
         }

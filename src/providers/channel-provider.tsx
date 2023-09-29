@@ -15,8 +15,7 @@ export async function createAmityChannel(
     if (users.length < 1) {
       return reject(new Error('Insufficient member count'));
     }
-    console.log('currentUserID:', currentUserID)
-    console.log('check user object list ' + JSON.stringify(users));
+
     let channelType: Amity.ChannelType =
       users.length > 1 ? 'community' : 'conversation';
     let userIds: string[] = [currentUserID];
@@ -29,7 +28,6 @@ export async function createAmityChannel(
       type: channelType,
       userIds: userIds,
     };
-    console.log('check channel param ' + JSON.stringify(param));
 
 
     const { data: channel,  } = await ChannelRepository.createChannel(param);
@@ -66,8 +64,6 @@ export async function updateAmityChannel(
   displayName: string | undefined
 ): Promise<Amity.Channel | undefined> {
   let option = {};
-  console.log('displayName:', displayName)
-  console.log('fileId pass:', fileId)
 
 
   return await new Promise(async (resolve, reject) => {

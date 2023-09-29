@@ -24,7 +24,6 @@ export type SelectUserList = {
 export default function SelectMembers() {
 
   const [sectionedUserList, setSectionedUserList] = useState<UserInterface[]>([]);
-  console.log('sectionedUserList:', sectionedUserList)
   const [selectedUserList, setSelectedUserList] = useState<UserInterface[]>([]);
   const [usersObject, setUsersObject] = useState<Amity.LiveCollection<Amity.User>>();
   const [searchTerm, setSearchTerm] = useState('');

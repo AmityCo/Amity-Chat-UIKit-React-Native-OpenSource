@@ -7,18 +7,10 @@ export default function Home() {
   const { client, logout } = useAuth();
 
   const clickLogin = () => {
-    console.log('pass');
-    console.log('client555: ', client);
     console.log('clientID: ', (client as Amity.Client).userId);
-    // console.log('displayName: ', displayName);
-    // console.log('userId: ', userId);
   };
   const clickLogout = () => {
-    console.log('pass');
-    console.log('client555: ', client);
     logout();
-    // console.log('displayName: ', displayName);
-    // console.log('userId: ', userId);
   };
   return (
     <View style={styles.container}>
