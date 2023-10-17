@@ -18,7 +18,6 @@ import styles from './styles';
 import CustomText from '../../components/CustomText';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Client } from '@amityco/ts-sdk-react-native'
 import LoadingIndicator from '../../components/LoadingIndicator/index';
 import AddMembersModal from '../../components/AddMembersModal';
 import type { UserInterface } from '../../types/user.interface';
@@ -89,24 +88,12 @@ export default function RecentChat() {
     );
     disposers.push(unsubscribe);
   };
-  const startSync = async () => {
-    await Client.startUnreadSync();
-
-  }
-
   useEffect(() => {
-    if(isConnected){
-      setTimeout(() => {
-        startSync()
-      }, 750);
-      setTimeout(() => {
-        onQueryChannel();
-      }, 1500);
-    }
- 
-    return () => {
-      disposers.forEach(fn => fn());
-    };
+      onQueryChannel();
+    
+    // return () => {
+    //   disposers.forEach(fn => fn());
+    // };
   }, [isConnected]);
 
 
