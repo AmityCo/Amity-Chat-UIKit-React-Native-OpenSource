@@ -89,11 +89,10 @@ export default function RecentChat() {
     disposers.push(unsubscribe);
   };
   useEffect(() => {
-      onQueryChannel();
-    
-    // return () => {
-    //   disposers.forEach(fn => fn());
-    // };
+    onQueryChannel();
+    return () => {
+      disposers.forEach(fn => fn());
+    };
   }, [isConnected]);
 
 
@@ -208,7 +207,7 @@ export default function RecentChat() {
       </View>
     );
   }, [loadChannel, channelObjects, handleLoadMore]);
-  const  renderChatList = (item: IChatListProps): ReactElement => {
+  const renderChatList = (item: IChatListProps): ReactElement => {
     return (
       <ChatList
         key={item.chatId}

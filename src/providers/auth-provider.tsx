@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState, type FC } from 'react';
-import { Client, enableCache } from '@amityco/ts-sdk-react-native';
+import { Client } from '@amityco/ts-sdk-react-native';
 import type { AuthContextInterface } from '../types/auth.interface';
 import { Alert } from 'react-native';
 import type { IAmityUIkitProvider } from './amity-ui-kit-provider';
@@ -25,9 +25,6 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
   apiEndpoint,
   children,
 }: IAmityUIkitProvider) => {
-  console.log('userId:', userId)
-  console.log('apiRegion:', apiRegion)
-  console.log('apiEndpoint:', apiEndpoint)
   const [error, setError] = useState('');
   const [isConnecting, setLoading] = useState(false);
   const [isConnected, setIsConnected] = useState(false);
@@ -36,8 +33,7 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
   const client: Amity.Client = Client.createClient(apiKey, apiRegion, {
     apiEndpoint: { http: apiEndpoint },
   });
-  enableCache();
-  console.log('client:', client)
+
   const sessionHandler: Amity.SessionHandler = {
     sessionWillRenewAccessToken(renewal) {
       renewal.renew();
@@ -49,20 +45,19 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
     return Client.onSessionStateChange((state: Amity.SessionStates) => setSessionState(state));
   }, []);
 
+  const startSync = async () => {
+    await Client.startUnreadSync();
+
+  }
 
   useEffect(() => {
-
+    startSync()
     if (sessionState === 'established') {
-      startSync()
       setIsConnected(true)
 
     }
   }, [sessionState])
 
-  const startSync = async () => {
-    await Client.startUnreadSync();
-
-  }
 
   const handleConnect = async () => {
     const response = await Client.login(
@@ -121,7 +116,7 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
         logout,
         isConnected,
         sessionState,
-        apiRegion: (apiRegion as string).toLowerCase()
+        apiRegion: apiRegion?.toLowerCase() as string
       }}
     >
       {children}

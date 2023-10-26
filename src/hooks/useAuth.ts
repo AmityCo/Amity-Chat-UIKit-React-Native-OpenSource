@@ -4,7 +4,8 @@ import { AuthContext } from '../providers/auth-provider';
 import type { AuthContextInterface } from '../types/auth.interface';
 
 const useAuth = (): AuthContextInterface => {
-  const { login, logout, client, isConnecting, isConnected,error, sessionState } = useContext(AuthContext);
+  const { login, logout, client, isConnecting, isConnected, error, sessionState, apiRegion } =
+    useContext(AuthContext);
 
   return {
     error,
@@ -13,7 +14,8 @@ const useAuth = (): AuthContextInterface => {
     logout,
     isConnecting,
     isConnected,
-    sessionState
+    sessionState,
+    apiRegion
   };
 };
 

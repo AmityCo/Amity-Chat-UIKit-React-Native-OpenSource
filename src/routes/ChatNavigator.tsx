@@ -14,13 +14,14 @@ import { ChatRoomSetting } from '../screens/ChatDetail/ChatRoomSetting';
 import { EditChatRoomDetail } from '../screens/EditChatDetail/EditChatRoomDetail';
 import MemberDetail from '../screens/MemberDetail/MemberDetail';
 import ChatRoom from '../screens/ChatRoom/ChatRoom';
+import useAuth from '../hooks/useAuth';
 
 export default function ChatNavigator() {
   const Stack = createNativeStackNavigator<RootStackParamList>();
+  const { isConnected } = useAuth();
   return (
     <NavigationContainer independent={true}>
-
-      <Stack.Navigator
+      {isConnected && <Stack.Navigator
         screenOptions={{
           headerShadowVisible: false,
           contentStyle: {
@@ -68,11 +69,12 @@ export default function ChatNavigator() {
             options={({ }) => ({
               title: '',
               headerShown: false
-            
+
             })}
           />
         </Stack.Group>
-      </Stack.Navigator>
+      </Stack.Navigator>}
+
     </NavigationContainer>
   );
 }
