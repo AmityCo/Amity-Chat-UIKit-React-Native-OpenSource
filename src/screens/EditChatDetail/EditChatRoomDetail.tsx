@@ -19,8 +19,9 @@ import { updateAmityChannel } from '../../providers/channel-provider';
 import { LoadingOverlay } from '../../components/LoadingOverlay';
 import * as ImagePicker from 'expo-image-picker';
 import LoadingImage from '../../components/LoadingImage';
-import type { RootStackParamList } from 'src/routes/RouteParamList';
+import type { RootStackParamList } from '../../routes/RouteParamList';
 import { RouteProp, useRoute } from '@react-navigation/native';
+import useAuth from '../../hooks/useAuth';
 interface EditChatDetailProps {
   navigation: any;
   route: any;
@@ -32,7 +33,7 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
   navigation,
 }) => {
 
-
+  const { apiRegion } = useAuth()
   const route = useRoute<RouteProp<RootStackParamList, 'EditChatDetail'>>();
   const MAX_CHARACTER_COUNT = 100;
   const { channelId, groupChat } = route.params;
@@ -177,7 +178,7 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
               style={styles.avatar}
               source={
                 groupChat?.avatarFileId
-                  ? { uri: `https://api.amity.co/api/v3/files/${groupChat?.avatarFileId}/download` }
+                  ? { uri: `https://api.${apiRegion}.amity.co/api/v3/files/${groupChat?.avatarFileId}/download` }
                   : require('../../../assets/icon/Placeholder.png')
               }
             />}
@@ -191,7 +192,7 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
             }
           /> */}
         </TouchableOpacity>
-        <View style={imageMultipleUri[0]?styles.uploadedCameraIconContainer:styles.cameraIconContainer}>
+        <View style={imageMultipleUri[0] ? styles.uploadedCameraIconContainer : styles.cameraIconContainer}>
           <TouchableOpacity onPress={handleAvatarPress}>
             <View style={styles.cameraIcon}>
               <Image

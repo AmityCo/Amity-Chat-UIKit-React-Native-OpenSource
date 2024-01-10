@@ -96,6 +96,6 @@ export const styles = StyleSheet.create({
     },
     disabledDone:{
       opacity: 0.5
-    }
+    },
   });
   
