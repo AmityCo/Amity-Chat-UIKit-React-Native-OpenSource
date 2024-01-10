@@ -48,5 +48,8 @@ export const styles = StyleSheet.create({
         marginTop: 5,
         fontSize: 13
     },
+    selectedUser:{
+        maxHeight: 100
+      }
 
 })

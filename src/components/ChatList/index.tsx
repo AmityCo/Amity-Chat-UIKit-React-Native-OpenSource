@@ -41,7 +41,7 @@ const ChatList: React.FC<IChatListProps> = ({
   avatarFileId,
 }: IChatListProps) => {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-  const { client } = useAuth();
+  const { client, apiRegion } = useAuth();
   const [oneOnOneChatObject, setOneOnOneChatObject] =
     useState<Amity.Membership<'channel'>[]>();
   const [groupChatObject, setGroupChatObject] =
@@ -122,7 +122,7 @@ const ChatList: React.FC<IChatListProps> = ({
             style={styles.icon}
             source={
               {
-                uri: `https://api.amity.co/api/v3/files/${avatarFileId}/download?size=small`,
+                uri: `https://api.${apiRegion}.amity.co/api/v3/files/${avatarFileId}/download?size=small`,
               }
             }
           /> : <View style={styles.icon}>

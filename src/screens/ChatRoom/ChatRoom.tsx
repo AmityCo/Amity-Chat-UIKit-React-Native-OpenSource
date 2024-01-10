@@ -78,7 +78,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
   const { chatReceiver, groupChat, channelId } = route.params;
 
-  const { client } = useAuth();
+  const { client, apiRegion } = useAuth();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [messagesData, setMessagesData] = useState<Amity.LiveCollection<Amity.Message>>();
   const [imageMultipleUri, setImageMultipleUri] = useState<string[]>([]);
@@ -118,7 +118,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
                 source={
                   chatReceiver?.avatarFileId
                     ? {
-                      uri: `https://api.amity.co/api/v3/files/${chatReceiver?.avatarFileId}/download`,
+                      uri: `https://api.${apiRegion}.amity.co/api/v3/files/${chatReceiver?.avatarFileId}/download`,
                     }
                     : require('../../../assets/icon/Placeholder.png')
                 }
@@ -127,7 +127,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               <Image
                 style={styles.avatar}
                 source={{
-                  uri: `https://api.amity.co/api/v3/files/${groupChat?.avatarFileId}/download`,
+                  uri: `https://api.${apiRegion}.amity.co/api/v3/files/${groupChat?.avatarFileId}/download`,
                 }}
               />
             ) : (
@@ -223,11 +223,11 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           targetIndex &&
           (groupChat?.users as any)[targetIndex as number]?.avatarFileId
         ) {
-          avatarUrl = `https://api.amity.co/api/v3/files/${(groupChat?.users as any)[targetIndex as number]
+          avatarUrl = `https://api.${apiRegion}.amity.co/api/v3/files/${(groupChat?.users as any)[targetIndex as number]
             ?.avatarFileId as any
             }/download`;
         } else if (chatReceiver && chatReceiver.avatarFileId) {
-          avatarUrl = `https://api.amity.co/api/v3/files/${chatReceiver.avatarFileId}/download`;
+          avatarUrl = `https://api.${apiRegion}.amity.co/api/v3/files/${chatReceiver.avatarFileId}/download`;
         }
 
         if ((item?.data as Record<string, any>)?.fileId) {
@@ -235,7 +235,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
             _id: item.messageId,
             text: '',
             image:
-              `https://api.amity.co/api/v3/files/${(item?.data as Record<string, any>).fileId
+              `https://api.${apiRegion}.amity.co/api/v3/files/${(item?.data as Record<string, any>).fileId
               }/download` ?? undefined,
             createdAt: item.createdAt as string,
             editedAt: item.updatedAt as string,
