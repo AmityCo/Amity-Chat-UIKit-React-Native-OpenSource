@@ -49,7 +49,7 @@ export const styles = StyleSheet.create({
         fontSize: 13
     },
     selectedUser:{
-        maxHeight: 100
+        height: 260
       }
 
 })

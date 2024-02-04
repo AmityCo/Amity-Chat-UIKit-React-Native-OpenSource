@@ -51,8 +51,9 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
   }
 
   useEffect(() => {
-    startSync()
+
     if (sessionState === 'established') {
+      startSync()
       setIsConnected(true)
 
     }

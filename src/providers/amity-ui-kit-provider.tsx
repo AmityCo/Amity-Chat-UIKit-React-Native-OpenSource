@@ -30,5 +30,6 @@ export default function AmityUiKitProvider({
         {children}
       </MenuProvider>
     </AuthContextProvider>
+
   );
 }

@@ -22,8 +22,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#FFFFFF',
-    marginHorizontal: 20,
-    marginVertical: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
   },
   addChatIcon: {
     width: 24,
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   iosWrap: {
     marginTop: 30,
   },
-  chatContainer:{
+  chatContainer: {
     paddingBottom: 110
   }
 });

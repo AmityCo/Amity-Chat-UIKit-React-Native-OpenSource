@@ -13,11 +13,14 @@ import {
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { styles } from './styles';
-import { circleCloseIcon, closeIcon, searchIcon } from '../../svg/svg-xml-list';
+import { circleCloseIcon } from '../../svg/svg-xml-list';
 import type { UserInterface } from '../../types/user.interface';
 import UserItem from '../UserItem';
 import SectionHeader from '../ListSectionHeader';
 import SelectedUserHorizontal from '../SelectedUserHorizontal';
+import { CloseIcon } from '../../svg/CloseIcon';
+import { SearchIcon } from '../../svg/SearchIcon';
+import { CircleCloseIcon } from '../../svg/CircleCloseIcon';
 interface IModal {
   visible: boolean;
   userId?: string;
@@ -142,7 +145,7 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
 
     if (yOffset >= 40) {
       setIsShowSectionHeader(true)
-    }else{
+    } else {
       setIsShowSectionHeader(false)
     }
   };
@@ -174,7 +177,7 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
       <View style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity style={styles.closeButton} onPress={handleOnClose}>
-            <SvgXml xml={closeIcon} width="14" height="14" />
+            <CloseIcon />
           </TouchableOpacity>
           <View style={styles.headerTextContainer}>
             <Text style={styles.headerText}>Select Member</Text>
@@ -183,9 +186,9 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
             <Text style={[selectedUserList.length > 0 ? styles.doneText : styles.disabledDone]}>Done</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.inputWrap}>
+      <View style={styles.inputWrap}>
           <TouchableOpacity onPress={() => queryAccounts(searchTerm)}>
-            <SvgXml xml={searchIcon} width="20" height="20" />
+          <SearchIcon/>
           </TouchableOpacity>
           <TextInput
             style={styles.input}
@@ -193,7 +196,7 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
             onChangeText={handleChange}
           />
           <TouchableOpacity onPress={clearButton}>
-            <SvgXml xml={circleCloseIcon} width="20" height="20" />
+           <CircleCloseIcon/>
           </TouchableOpacity>
         </View>
         {selectedUserList.length > 0 ? (
@@ -210,12 +213,12 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
           onEndReached={handleLoadMore}
           onEndReachedThreshold={0.5}
           keyExtractor={(item) => item.userId}
-          ListHeaderComponent={isShowSectionHeader?renderSectionHeader:<View/>}
+          ListHeaderComponent={isShowSectionHeader ? renderSectionHeader : <View />}
           stickyHeaderIndices={[0]}
           ref={flatListRef}
           onScroll={handleScroll}
         />
-      </View>
+      </View> 
     </Modal>
   );
 };

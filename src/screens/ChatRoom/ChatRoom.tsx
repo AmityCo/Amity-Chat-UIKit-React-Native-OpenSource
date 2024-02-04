@@ -493,6 +493,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           mediaTypes: ImagePicker.MediaTypeOptions.All,
           aspect: [4, 3],
           quality: 1,
+          base64: false
         });
 
       if (
@@ -571,8 +572,9 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
       allowsEditing: false,
       quality: 1,
       allowsMultipleSelection: true,
+      base64: false
     });
-
+    console.log('result: ', result);
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const selectedImages = result.assets;
@@ -699,12 +701,12 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           </View>
         )}
       </KeyboardAvoidingView>
-      <ImageView
+      {/* <ImageView
         images={[{ uri: fullImage }]}
         imageIndex={0}
         visible={visibleFullImage}
         onRequestClose={() => setIsVisibleFullImage(false)}
-      />
+      /> */}
       <EditMessageModal
         visible={editMessageModal}
         onClose={closeEditMessageModal}

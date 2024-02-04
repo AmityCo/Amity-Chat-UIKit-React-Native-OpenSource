@@ -30,6 +30,7 @@ const LoadingImage = ({
   const [isProcess, setIsProcess] = useState<boolean>(false);
   const [isFinish, setIsFinish] = useState(false)
   const styles = createStyles();
+  console.log('source: ', source);
 
   const handleLoadEnd = () => {
     setLoading(false);
@@ -41,13 +42,15 @@ const LoadingImage = ({
   }, [progress]);
 
   const uploadFileToAmity = useCallback(async () => {
-    if (!isFinish) {
+
+    if (!isFinish ) {
       const file: Amity.File<any>[] = await uploadImageFile(
         source,
         (percent: number) => {
           setProgress(percent);
           console.log('percent:', percent)
-        }
+        },
+        true
 
       );
       if (file) {
@@ -78,7 +81,7 @@ const LoadingImage = ({
         <Image
           source={{ uri: source }}
           style={[
-            containerStyle?containerStyle:styles.image,
+            containerStyle ? containerStyle : styles.image,
             loading ? styles.loadingImage : styles.loadedImage,
           ]}
         />

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   Image,
   SafeAreaView,
+  Text,
 } from 'react-native';
 
 import { ChannelRepository, getChannelTopic, subscribeTopic } from '@amityco/ts-sdk-react-native';
@@ -56,11 +57,11 @@ export default function RecentChat() {
 
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-
+useEffect(() => {
   navigation.setOptions({
 
     header: () => (
-      <SafeAreaView style={styles.topBar}>
+      <View style={styles.topBar}>
         <CustomText style={styles.titleText}>Chat</CustomText>
         <TouchableOpacity
           onPress={() => {
@@ -72,10 +73,14 @@ export default function RecentChat() {
             source={require('../../../assets/icon/addChat.png')}
           />
         </TouchableOpacity>
-      </SafeAreaView>
+      </View>
     ),
     headerTitle: '',
   });
+
+
+}, [])
+
 
 
   const onQueryChannel = () => {
@@ -207,6 +212,7 @@ export default function RecentChat() {
           ref={flatListRef}
           contentContainerStyle={{ flexGrow: 1 }}
         />
+  
       </View>
     );
   }, [loadChannel, channelObjects, handleLoadMore]);
@@ -236,9 +242,9 @@ export default function RecentChat() {
 
   return (
     <View style={styles.chatContainer}>
-      {renderTabView()}
+     {renderTabView()}
       {renderRecentChat}
-      <AddMembersModal onFinish={handleOnFinish} onClose={handleCloseModal} visible={isModalVisible} />
+      <AddMembersModal onFinish={handleOnFinish} onClose={handleCloseModal} visible={isModalVisible} /> 
     </View>
   );
 }
