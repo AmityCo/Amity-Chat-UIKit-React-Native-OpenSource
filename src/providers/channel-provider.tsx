@@ -36,7 +36,6 @@ export async function createAmityChannel(
     }else{
       reject(' Create Channel unsuccessful')
     }
-    console.log('param:', param)
   });
 }
 
@@ -91,11 +90,8 @@ export async function updateAmityChannel(
       );
     }
     try {
-      console.log(option)
       const {data} = await ChannelRepository.updateChannel(channelID, option);
-      console.log('updateChannel:', data)
       if(data){
-    
          resolve(data);
       }
     } catch (error) {

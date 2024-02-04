@@ -10,20 +10,22 @@ export const styles = StyleSheet.create({
     },
     avatarContainer: {
         position: 'relative',
-        marginBottom: 20,
+        marginTop: 20,
+        marginBottom: 48
+        
     },
     avatar: {
         width: 64,
         height: 64,
         borderRadius: 32
     },
-    uploadedImage:{
+    uploadedImage: {
         width: 55,
         height: 53,
         borderRadius: 32
     },
     overlay: {
-        
+
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1,
@@ -45,13 +47,13 @@ export const styles = StyleSheet.create({
         padding: 5,
         margin: 5,
     },
-    imageIcon: {
 
-    },
     displayNameContainer: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 10,
+        justifyContent: 'space-between',
+        width: '100%'
     },
     displayNameText: {
         flex: 1,
@@ -73,5 +75,23 @@ export const styles = StyleSheet.create({
         borderRadius: 5,
         borderColor: '#EBECEF',
         fontSize: 16,
+    },
+    topBar: {
+        display: 'flex',
+        flexDirection: 'row',
+        backgroundColor: '#FFFFFF',
+        paddingHorizontal: 16,
+        paddingVertical: 20
+    },
+    headerTextContainer: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    headerText: {
+        fontWeight: '600',
+        fontSize: 17,
+        textAlign: 'center',
     },
 });

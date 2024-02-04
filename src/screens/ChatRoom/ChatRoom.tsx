@@ -12,9 +12,8 @@ import {
   KeyboardAvoidingView,
   FlatList,
   Keyboard,
-  Alert,
 } from 'react-native';
-import ImageView from 'react-native-image-viewing';
+// import ImageView from 'react-native-image-viewing';
 import CustomText from '../../components/CustomText';
 import styles from './styles';
 import { RouteProp, useNavigation } from '@react-navigation/native';
@@ -36,9 +35,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import LoadingImage from '../../components/LoadingImage';
 import {
   Menu,
-  MenuOptions,
-  MenuOption,
-  MenuTrigger,
+  // MenuOptions,
+  // MenuOption,
+  // MenuTrigger,
 } from "react-native-popup-menu";
 import { SvgXml } from 'react-native-svg';
 import { deletedIcon } from '../../svg/svg-xml-list';
@@ -93,8 +92,8 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   const [sortedMessages, setSortedMessages] = useState<IMessage[]>([]);
   const flatListRef = useRef(null);
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [visibleFullImage, setIsVisibleFullImage] = useState<boolean>(false);
-  const [fullImage, setFullImage] = useState<string>('');
+  // const [visibleFullImage, setIsVisibleFullImage] = useState<boolean>(false);
+  // const [fullImage, setFullImage] = useState<string>('');
   const [subChannelData, setSubChannelData] = useState<Amity.SubChannel>();
   const [displayImages, setDisplayImages] = useState<IDisplayImage[]>([]);
   const [editMessageModal, setEditMessageModal] = useState<boolean>(false)
@@ -308,14 +307,14 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     setSortedMessages([...reOrderArr]);
   }, [messages]);
 
-  const openFullImage = (image: string, messageType: string) => {
-    if (messageType === 'image' || messageType === 'file') {
-      const fullSizeImage: string = image + '?size=full';
-      setFullImage(fullSizeImage);
-      setIsVisibleFullImage(true);
-    }
+  // const openFullImage = (image: string, messageType: string) => {
+  //   if (messageType === 'image' || messageType === 'file') {
+  //     const fullSizeImage: string = image + '?size=full';
+  //     setFullImage(fullSizeImage);
+  //     setIsVisibleFullImage(true);
+  //   }
 
-  };
+  // };
   const renderTimeDivider = (date: string) => {
     const currentDate = date;
     const formattedDate = moment(currentDate).format('MMMM DD, YYYY');
@@ -338,19 +337,19 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     );
   };
 
-  const deleteMessage = async (messageId: string) => {
-    const message = await MessageRepository.softDeleteMessage(messageId);
-    return message
+  // const deleteMessage = async (messageId: string) => {
+  //   const message = await MessageRepository.softDeleteMessage(messageId);
+  //   return message
 
-  }
+  // }
 
-  const reportMessage = async (messageId: string) => {
-    const isFlagged = await MessageRepository.flagMessage(messageId);
-    if (isFlagged) {
-      Alert.alert('Report sent ✅')
-    }
+  // const reportMessage = async (messageId: string) => {
+  //   const isFlagged = await MessageRepository.flagMessage(messageId);
+  //   if (isFlagged) {
+  //     Alert.alert('Report sent ✅')
+  //   }
 
-  }
+  // }
 
 
   const renderChatMessages = (message: IMessage, index: number) => {
@@ -405,7 +404,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               </View>
 
               : <Menu>
-                <MenuTrigger onAlternativeAction={() => openFullImage(message.image as string, message.messageType)} customStyles={{ triggerTouchable: { underlayColor: 'transparent' } }} triggerOnLongPress>
+                {/* <MenuTrigger onAlternativeAction={() => openFullImage(message.image as string, message.messageType)} customStyles={{ triggerTouchable: { underlayColor: 'transparent' } }} triggerOnLongPress> */}
                   {message.messageType === 'text' ? (
                     <View
                       key={message._id}
@@ -436,15 +435,15 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
                       />
                     </View>
                   )}
-                </MenuTrigger>
-                <MenuOptions customStyles={{ optionsContainer: { ...styles.optionsContainer, marginLeft: isUserChat ? 240 + ((message.text && message.text.length < 5) ? message.text.length * 10 : 10) : 0 } }}>
+                {/* </MenuTrigger> */}
+                {/* <MenuOptions customStyles={{ optionsContainer: { ...styles.optionsContainer, marginLeft: isUserChat ? 240 + ((message.text && message.text.length < 5) ? message.text.length * 10 : 10) : 0 } }}>
                   {isUserChat ? <MenuOption onSelect={() => Alert.alert('Delete this message?', `Message will be also be permanently removed from your friend's devices.`, [
                     { text: 'Cancel', style: 'cancel' },
                     { text: 'Delete', style: 'destructive', onPress: () => deleteMessage(message._id) },
                   ])} text="Delete" /> : <MenuOption onSelect={() => reportMessage(message._id)} text="Report" />}
                   {(message.messageType === 'text' && isUserChat) && <MenuOption onSelect={() => { return openEditMessageModal(message._id, message.text as string) }} text="Edit" />}
 
-                </MenuOptions>
+                </MenuOptions> */}
 
               </Menu>}
             <Text
@@ -574,7 +573,6 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
       allowsMultipleSelection: true,
       base64: false
     });
-    console.log('result: ', result);
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const selectedImages = result.assets;
@@ -606,11 +604,11 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     );
   }, [displayImages, handleOnFinishImage]);
 
-  const openEditMessageModal = (messageId: string, text: string) => {
-    setEditMessageId(messageId)
-    setEditMessageModal(true)
-    setEditMessageText(text)
-  }
+  // const openEditMessageModal = (messageId: string, text: string) => {
+  //   setEditMessageId(messageId)
+  //   setEditMessageModal(true)
+  //   setEditMessageText(text)
+  // }
 
   const closeEditMessageModal = () => {
     setEditMessageId('')

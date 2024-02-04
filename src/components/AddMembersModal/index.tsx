@@ -11,9 +11,7 @@ import {
   FlatList,
   NativeSyntheticEvent,
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { styles } from './styles';
-import { circleCloseIcon } from '../../svg/svg-xml-list';
 import type { UserInterface } from '../../types/user.interface';
 import UserItem from '../UserItem';
 import SectionHeader from '../ListSectionHeader';

@@ -11244,6 +11244,13 @@ react-is@^17.0.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-17.0.2.tgz#e691d4a8e9c789365655539ab372762b0efb54f0"
   integrity sha512-w2GsyukL62IJnlaff/nRegPQR94C/XXamvMWmSHRJ4y7Ts/4ocGRmTHvOs8PSE6pB3dWOrD/nueuU5sduBsQ4w==
 
+react-native-awesome-alerts@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-awesome-alerts/-/react-native-awesome-alerts-2.0.0.tgz#beb981ed50671c51fcd227c5bb6c58d4d493b681"
+  integrity sha512-ZRBNnDfpE+aQCtXXnQcfGLqwzZ53Q45CNkQI4hOiF8/9JPuCyMUQL2aqtiypnLpCIX+CB28Jcx1KVJ6/reaZsg==
+  dependencies:
+    prop-types "^15.7.2"
+
 react-native-builder-bob@^0.20.4:
   version "0.20.4"
   resolved "https://registry.yarnpkg.com/react-native-builder-bob/-/react-native-builder-bob-0.20.4.tgz#02df01b8dc02f1bb2d566f820e33c5d42bfb9c99"

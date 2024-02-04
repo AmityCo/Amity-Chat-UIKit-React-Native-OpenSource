@@ -15,7 +15,7 @@ import { EditChatRoomDetail } from '../screens/EditChatDetail/EditChatRoomDetail
 import MemberDetail from '../screens/MemberDetail/MemberDetail';
 import ChatRoom from '../screens/ChatRoom/ChatRoom';
 import useAuth from '../hooks/useAuth';
-import Home from '../components/Home';
+
 
 export default function ChatNavigator() {
   const Stack = createNativeStackNavigator<RootStackParamList>();

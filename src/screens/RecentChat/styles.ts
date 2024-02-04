@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 20,
-    paddingVertical: 18,
+    paddingVertical: 20,
   },
   addChatIcon: {
     width: 24,
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   chatContainer: {
-    paddingBottom: 110
+    flex:1 
   }
 });
 

@@ -8,13 +8,15 @@ import {
   TextInput,
   FlatList,
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
+
 import { styles } from './styles';
-import { backIcon, circleCloseIcon, searchIcon } from '../../svg/svg-xml-list';
 import type { UserInterface } from '../../types/user.interface';
 import UserItem from '../../components/UserItem';
 
 import CustomTab from '../../components/CustomTab';
+import { SearchIcon } from '../../svg/SearchIcon';
+import { CircleCloseIcon } from '../../svg/CircleCloseIcon';
+import { BackIcon } from '../../svg/BackIcon';
 
 export type SelectUserList = {
   title: string;
@@ -35,9 +37,8 @@ export default function MemberDetail({ route, navigation }: any) {
   const queryAccounts = (text: string = '', roles?: string[]) => {
 
     ChannelRepository.Membership.getMembers(
-      { channelId: channelID , limit: 15, search: text, roles: roles ?? [] },
+      { channelId: channelID, limit: 15, search: text, roles: roles ?? [] },
       (data) => {
-      	console.log('data:', data)
         setUsersObject(data)
 
       }
@@ -49,11 +50,11 @@ export default function MemberDetail({ route, navigation }: any) {
     setSearchTerm(text);
   };
   useEffect(() => {
-    if (searchTerm.length > 0 && tabIndex ===1) {
+    if (searchTerm.length > 0 && tabIndex === 1) {
       queryAccounts(searchTerm);
     }
-    else if(searchTerm.length > 0 && tabIndex ===2){
-      queryAccounts(searchTerm,['channel-moderator'] );
+    else if (searchTerm.length > 0 && tabIndex === 2) {
+      queryAccounts(searchTerm, ['channel-moderator']);
     }
   }, [searchTerm]);
 
@@ -66,7 +67,7 @@ export default function MemberDetail({ route, navigation }: any) {
       return { userId: item.userId, displayName: item.user?.displayName as string, avatarFileId: item.user?.avatarFileId as string }
     })
     setSectionedUserList(sectionUserArr)
- 
+
   }
 
   useEffect(() => {
@@ -74,13 +75,13 @@ export default function MemberDetail({ route, navigation }: any) {
   }, [userArr])
 
   useEffect(() => {
-    if (searchTerm.length === 0 && tabIndex ===1) {
+    if (searchTerm.length === 0 && tabIndex === 1) {
       queryAccounts()
-    }else if(searchTerm.length === 0 && tabIndex ===2){
-        queryAccounts('', ['channel-moderator'])
-      }
+    } else if (searchTerm.length === 0 && tabIndex === 2) {
+      queryAccounts('', ['channel-moderator'])
+    }
 
-  }, [searchTerm,tabIndex])
+  }, [searchTerm, tabIndex])
 
 
 
@@ -94,7 +95,7 @@ export default function MemberDetail({ route, navigation }: any) {
 
     const userObj: UserInterface = { userId: item.userId, displayName: item.displayName as string, avatarFileId: item.avatarFileId as string }
     return (
-      <UserItem showThreeDot={true} user={userObj}  onThreeDotTap={onUserPressed} />
+      <UserItem showThreeDot={true} user={userObj} onThreeDotTap={onUserPressed} />
     );
   };
 
@@ -119,7 +120,7 @@ export default function MemberDetail({ route, navigation }: any) {
     <View style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={handleGoBack} style={styles.closeButton}>
-          <SvgXml xml={backIcon} width="16" height="16" />
+          <BackIcon />
         </TouchableOpacity>
         <View style={styles.headerTextContainer}>
           <Text style={styles.headerText}>Member Detail</Text>
@@ -128,7 +129,7 @@ export default function MemberDetail({ route, navigation }: any) {
       <CustomTab tabName={['Members', 'Moderators']} onTabChange={handleTabChange} />
       <View style={styles.inputWrap}>
         <TouchableOpacity onPress={() => queryAccounts(searchTerm)}>
-          <SvgXml xml={searchIcon} width="20" height="20" />
+          <SearchIcon />
         </TouchableOpacity>
         <TextInput
           style={styles.input}
@@ -136,7 +137,7 @@ export default function MemberDetail({ route, navigation }: any) {
           onChangeText={handleChange}
         />
         <TouchableOpacity onPress={clearButton}>
-          <SvgXml xml={circleCloseIcon} width="20" height="20" />
+          <CircleCloseIcon />
         </TouchableOpacity>
       </View>
 

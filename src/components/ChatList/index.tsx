@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-shadow */
 import * as React from 'react';
 
-import { View, TouchableHighlight, Image, Text } from 'react-native';
+import { View, TouchableHighlight, Image } from 'react-native';
 
 import { ChannelRepository } from '@amityco/ts-sdk-react-native';
 import CustomText from '../CustomText';
@@ -12,10 +12,6 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import type { UserInterface } from '../../types/user.interface';
-import Svg, { Path, SvgXml } from 'react-native-svg';
-import { communityChatIcon, privateChatIcon } from '../../svg/svg-xml-list';
-import Avatar from '../../svg/Avatar.svg'
-import SvgUri from 'react-native-svg-uri';
 import { CommunityChatIcon } from '../../svg/CommunityChatIcon';
 import { PrivateChatIcon } from '../../svg/PrivateChatIcon';
 export interface IChatListProps {

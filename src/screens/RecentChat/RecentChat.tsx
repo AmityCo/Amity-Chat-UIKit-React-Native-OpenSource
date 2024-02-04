@@ -5,8 +5,6 @@ import {
   FlatList,
   TouchableOpacity,
   Image,
-  SafeAreaView,
-  Text,
 } from 'react-native';
 
 import { ChannelRepository, getChannelTopic, subscribeTopic } from '@amityco/ts-sdk-react-native';
@@ -85,7 +83,7 @@ useEffect(() => {
 
   const onQueryChannel = () => {
     const unsubscribe = ChannelRepository.getChannels(
-      { sortBy: 'lastActivity', limit: 10, membership: 'member' },
+      { sortBy: 'lastActivity', limit: 15, membership: 'member' },
       (value) => {
         setChannelData(value);
         subscribeChannels(channels);
@@ -178,8 +176,6 @@ useEffect(() => {
             memberCount: channel.memberCount as number,
             avatarFileId: channel.avatarFileId
           };
-          console.log('groupChatObject: ', groupChatObject);
-
 
           navigation.navigate('ChatRoom', {
             channelId: channel.channelId,
@@ -202,15 +198,15 @@ useEffect(() => {
         <LoadingIndicator />
       </View>
     ) : (
-      <View>
+      <View style={{flex: 1}}>
         <FlatList
           data={channelObjects}
           renderItem={({ item }) => renderChatList(item)}
           keyExtractor={(item) => item.chatId.toString()}
           onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.3}
+          onEndReachedThreshold={0.4}
           ref={flatListRef}
-          contentContainerStyle={{ flexGrow: 1 }}
+          contentContainerStyle={{ flex: 1 }}
         />
   
       </View>

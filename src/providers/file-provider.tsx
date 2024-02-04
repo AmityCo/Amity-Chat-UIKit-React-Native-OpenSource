@@ -49,9 +49,9 @@ export async function uploadImageFile(
   return await new Promise(async (resolve, reject) => {
 
     const formData = new FormData();
-    if (isBase64) {
+    if (isBase64 && Platform.OS !== 'ios' && Platform.OS !== 'android') {
+
       const imageBlob = await base64ToBlob(filePath);
-      console.log('imageBlob: ', imageBlob);
       formData.append('files', imageBlob);
     } else {
       const parts = filePath.split('/');

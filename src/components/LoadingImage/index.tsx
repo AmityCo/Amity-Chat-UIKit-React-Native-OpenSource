@@ -30,7 +30,6 @@ const LoadingImage = ({
   const [isProcess, setIsProcess] = useState<boolean>(false);
   const [isFinish, setIsFinish] = useState(false)
   const styles = createStyles();
-  console.log('source: ', source);
 
   const handleLoadEnd = () => {
     setLoading(false);
