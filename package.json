@@ -1,6 +1,6 @@
 {
   "name": "@amityco/react-native-chat-ui-kit",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "react native chat uikit",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",
@@ -174,7 +174,6 @@
     "react-native-safe-area-context": "4.6.3",
     "react-native-screens": "3.20.0",
     "react-native-svg": "14.1.0",
-    "react-native-svg-uri": "^1.2.3",
     "use-memo-one": "1.1.3"
   }
 }

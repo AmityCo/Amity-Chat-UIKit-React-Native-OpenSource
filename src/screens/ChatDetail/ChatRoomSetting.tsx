@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import { leaveAmityChannel } from '../../providers/channel-provider';
 import { styles } from './styles';
 import { createReport } from '@amityco/ts-sdk-react-native';
 import AwesomeAlert from 'react-native-awesome-alerts';
+import EditIcon from '../../svg/EditIcon';
+import { ArrowRightIcon } from '../../svg/ArrowRightIcon';
+import { GroupMembersIcon } from '../../svg/GroupMembersIcon';
 
 interface ChatDetailProps {
     navigation: any;
@@ -41,20 +44,20 @@ export const ChatRoomSetting: React.FC<ChatDetailProps> = ({ navigation, route }
                 return (
                     <TouchableOpacity style={styles.rowContainer} onPress={handleGroupProfilePress}>
                         <View style={styles.iconContainer}>
-                            <Image source={require('../../../assets/icon/editPencil.png')} style={styles.icon} />
+                           <EditIcon/>
                         </View>
                         <Text style={styles.rowText}>Group profile</Text>
-                        <Image source={require('../../../assets/icon/arrowRight.png')} style={styles.arrowIcon} />
+                       <ArrowRightIcon/>
                     </TouchableOpacity>
                 );
             case 2:
                 return (
                     <TouchableOpacity style={styles.rowContainer} onPress={handleMembersPress}>
                         <View style={styles.iconContainer}>
-                            <Image source={require('../../../assets/icon/groupMember.png')} style={styles.groupIcon} />
+                            <GroupMembersIcon/>
                         </View>
                         <Text style={styles.rowText}>Members</Text>
-                        <Image source={require('../../../assets/icon/arrowRight.png')} style={styles.arrowIcon} />
+                        <ArrowRightIcon/>
                     </TouchableOpacity>
                 );
             case 3:

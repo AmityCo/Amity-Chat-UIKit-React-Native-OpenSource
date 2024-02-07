@@ -3,6 +3,7 @@ import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import { styles } from './styles';
 import type { UserInterface } from '../../types/user.interface';
 import useAuth from '../../hooks/useAuth';
+import { AvatarIcon } from '../../svg/AvatarIcon';
 
 const maxLength = 10;
 const displayName = (user: UserInterface) => {
@@ -29,14 +30,13 @@ const AvatarListItem = ({
     <View style={styles.avatarContainer}>
       <View style={styles.avatar}>
         <View style={styles.avatarImageContainer}>
-          <Image
+          {user.avatarFileId ? <Image
             style={styles.avatarImage}
             source={
-              user.avatarFileId
-                ? { uri: avatarFileURL(user.avatarFileId) }
-                : require('../../../assets/icon/Placeholder.png')
-            }
-          />
+              { uri: avatarFileURL(user.avatarFileId) }
+
+            } /> : <AvatarIcon />}
+
         </View>
         <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
           <Text style={styles.deleteButtonText}>✕</Text>

@@ -4,6 +4,8 @@ import { styles } from './styles';
 import RoundCheckbox from '../RoundCheckbox/index';
 import type { UserInterface } from 'src/types/user.interface';
 import useAuth from '../../hooks/useAuth';
+import { AvatarIcon } from '../../svg/AvatarIcon';
+import { ThreeDotsIcon } from '../../svg/ThreeDotsIcon';
 
 export default function UserItem({
   user,
@@ -44,16 +46,19 @@ export default function UserItem({
   return (
     <TouchableOpacity style={styles.listItem} onPress={handleToggle}>
       <View style={styles.leftContainer}>
-        <Image
-          style={styles.avatar}
-          source={
-            user.avatarFileId
-              ? {
-                uri: user.avatarFileId && avatarFileURL(user.avatarFileId!),
+        {
+          user.avatarFileId ?
+            <Image
+              style={styles.avatar}
+              source={
+                {
+                  uri: user.avatarFileId && avatarFileURL(user.avatarFileId!),
+                }
+
               }
-              : require('../../../assets/icon/Placeholder.png')
-          }
-        />
+            /> : <View style={styles.avatar}> <AvatarIcon /></View>
+        }
+
         <Text style={styles.itemText}>{displayName()}</Text>
       </View>
       {!showThreeDot ? (
@@ -66,10 +71,7 @@ export default function UserItem({
             }
           }}
         >
-          <Image
-            source={require('../../../assets/icon/threeDot.png')}
-            style={styles.dotIcon}
-          />
+          <ThreeDotsIcon />
         </TouchableOpacity>
       )}
     </TouchableOpacity>

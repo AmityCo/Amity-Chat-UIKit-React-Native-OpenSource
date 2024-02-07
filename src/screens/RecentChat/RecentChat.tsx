@@ -4,7 +4,6 @@ import {
   View,
   FlatList,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 
 import { ChannelRepository, getChannelTopic, subscribeTopic } from '@amityco/ts-sdk-react-native';
@@ -21,6 +20,7 @@ import LoadingIndicator from '../../components/LoadingIndicator/index';
 import AddMembersModal from '../../components/AddMembersModal';
 import type { UserInterface } from '../../types/user.interface';
 import { createAmityChannel } from '../../providers/channel-provider';
+import { AddChatIcon } from '../../svg/AddChat';
 
 export default function RecentChat() {
   const { client, isConnected } = useAuth();
@@ -66,10 +66,7 @@ useEffect(() => {
             setIsModalVisible(true)
           }}
         >
-          <Image
-            style={styles.addChatIcon}
-            source={require('../../../assets/icon/addChat.png')}
-          />
+        <AddChatIcon/>
         </TouchableOpacity>
       </View>
     ),

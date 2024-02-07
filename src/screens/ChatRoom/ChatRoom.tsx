@@ -42,6 +42,13 @@ import {
 import { SvgXml } from 'react-native-svg';
 import { deletedIcon } from '../../svg/svg-xml-list';
 import EditMessageModal from '../../components/EditMessageModal';
+import { GroupChatIcon } from '../../svg/GroupChatIcon';
+import { AvatarIcon } from '../../svg/AvatarIcon';
+import { CameraBoldIcon } from '../../svg/CameraBoldIcon';
+import { MenuIcon } from '../../svg/MenuIcon';
+import { PlusIcon } from '../../svg/PlusIcon';
+import { SendChatIcon } from '../../svg/SendChatIcon';
+import { AlbumIcon } from '../../svg/AlbumIcon';
 
 type ChatRoomScreenComponentType = React.FC<{
   route: RouteProp<RootStackParamList, 'ChatRoom'>;
@@ -112,16 +119,16 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
             </TouchableOpacity>
 
             {chatReceiver ? (
-              <Image
-                style={styles.avatar}
-                source={
-                  chatReceiver?.avatarFileId
-                    ? {
+              chatReceiver?.avatarFileId ?
+                <Image
+                  style={styles.avatar}
+                  source={
+                    {
                       uri: `https://api.${apiRegion}.amity.co/api/v3/files/${chatReceiver?.avatarFileId}/download`,
                     }
-                    : require('../../../assets/icon/Placeholder.png')
-                }
-              />
+
+                  }
+                /> : <View style={styles.avatar}> <AvatarIcon /></View>
             ) : groupChat?.avatarFileId ? (
               <Image
                 style={styles.avatar}
@@ -131,10 +138,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               />
             ) : (
               <View style={styles.icon}>
-                <Image
-                  style={styles.chatIcon}
-                  source={require('../../../assets/icon/GroupChat.png')}
-                />
+                <GroupChatIcon />
               </View>
             )}
             <View>
@@ -155,10 +159,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               navigation.navigate('ChatDetail', { channelId: channelId, channelType: chatReceiver ? 'conversation' : 'community', chatReceiver: chatReceiver ?? undefined, groupChat: groupChat ?? undefined });
             }}
           >
-            <Image
-              style={styles.settingIcon}
-              source={require('../../../assets/icon/setting.png')}
-            />
+            <MenuIcon />
           </TouchableOpacity>
         </View>
       </SafeAreaView>
@@ -374,14 +375,14 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
           style={!isUserChat ? styles.leftMessageWrap : styles.rightMessageWrap}
         >
           {!isUserChat && (
-            <Image
-              source={
-                message.user.avatar
-                  ? { uri: message.user.avatar }
-                  : require('../../../assets/icon/Placeholder.png')
-              }
-              style={styles.avatarImage}
-            />
+            message.user.avatar ?
+              <Image
+                source={
+                  { uri: message.user.avatar }
+
+                }
+                style={styles.avatarImage}
+              /> : <View style={styles.avatarImage} ><AvatarIcon /></View>
           )}
 
           <View>
@@ -405,36 +406,36 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
               : <Menu>
                 {/* <MenuTrigger onAlternativeAction={() => openFullImage(message.image as string, message.messageType)} customStyles={{ triggerTouchable: { underlayColor: 'transparent' } }} triggerOnLongPress> */}
-                  {message.messageType === 'text' ? (
-                    <View
-                      key={message._id}
-                      style={[
-                        styles.textChatBubble,
-                        isUserChat ? styles.userBubble : styles.friendBubble,
-                      ]}
+                {message.messageType === 'text' ? (
+                  <View
+                    key={message._id}
+                    style={[
+                      styles.textChatBubble,
+                      isUserChat ? styles.userBubble : styles.friendBubble,
+                    ]}
+                  >
+                    <Text
+                      style={isUserChat ? styles.chatUserText : styles.chatFriendText}
                     >
-                      <Text
-                        style={isUserChat ? styles.chatUserText : styles.chatFriendText}
-                      >
-                        {message.text}
-                      </Text>
-                    </View>
-                  ) : (
-                    <View
-                      style={[
-                        styles.imageChatBubble,
-                        isUserChat ? styles.userImageBubble : styles.friendBubble,
-                      ]}
-                    >
+                      {message.text}
+                    </Text>
+                  </View>
+                ) : (
+                  <View
+                    style={[
+                      styles.imageChatBubble,
+                      isUserChat ? styles.userImageBubble : styles.friendBubble,
+                    ]}
+                  >
 
-                      <Image
-                        style={styles.imageMessage}
-                        source={{
-                          uri: message.image + '?size=medium',
-                        }}
-                      />
-                    </View>
-                  )}
+                    <Image
+                      style={styles.imageMessage}
+                      source={{
+                        uri: message.image + '?size=medium',
+                      }}
+                    />
+                  </View>
+                )}
                 {/* </MenuTrigger> */}
                 {/* <MenuOptions customStyles={{ optionsContainer: { ...styles.optionsContainer, marginLeft: isUserChat ? 240 + ((message.text && message.text.length < 5) ? message.text.length * 10 : 10) : 0 } }}>
                   {isUserChat ? <MenuOption onSelect={() => Alert.alert('Delete this message?', `Message will be also be permanently removed from your friend's devices.`, [
@@ -652,19 +653,13 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
           {inputMessage.length > 0 ? (
             <TouchableOpacity onPress={handleSend} style={styles.sendIcon}>
-              <Image
-                source={require('../../../assets/icon/send.png')}
-                style={{ width: 24, height: 24 }}
-              />
+              <SendChatIcon />
             </TouchableOpacity>
           ) : (
             <View>
 
               <TouchableOpacity onPress={handlePress} style={styles.sendIcon}>
-                <Image
-                  source={require('../../../assets/icon/plus.png')}
-                  style={{ width: 20, height: 20 }}
-                />
+                <PlusIcon />
               </TouchableOpacity>
             </View>
           )}
@@ -676,10 +671,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               style={{ marginHorizontal: 30 }}
             >
               <View style={styles.IconCircle}>
-                <Image
-                  source={require('../../../assets/icon/camera.png')}
-                  style={{ width: 32, height: 28 }}
-                />
+                <CameraBoldIcon />
               </View>
               <CustomText>Camera</CustomText>
             </TouchableOpacity>
@@ -689,10 +681,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               style={{ marginHorizontal: 20, alignItems: 'center' }}
             >
               <View style={styles.IconCircle}>
-                <Image
-                  source={require('../../../assets/icon/gallery.png')}
-                  style={{ width: 32, height: 28 }}
-                />
+                <AlbumIcon />
               </View>
               <CustomText>Album</CustomText>
             </TouchableOpacity>

@@ -23,6 +23,7 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import useAuth from '../../hooks/useAuth';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { CameraIcon } from '../../svg/CameraIcon';
+import { AvatarIcon } from '../../svg/AvatarIcon';
 
 interface EditChatDetailProps {
   navigation: any;
@@ -53,13 +54,13 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
 
       header: () => (
         <SafeAreaView edges={['top']}>
-        <View style={styles.topBar}>
-          <CloseButton navigation={navigation} />
-          <View style={styles.headerTextContainer}>
-          <Text style={styles.headerText}>Member Detail</Text>
-        </View>
-          <DoneButton navigation={navigation} onDonePressed={onDonePressed} />
-        </View>
+          <View style={styles.topBar}>
+            <CloseButton navigation={navigation} />
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.headerText}>Member Detail</Text>
+            </View>
+            <DoneButton navigation={navigation} onDonePressed={onDonePressed} />
+          </View>
         </SafeAreaView>
       ),
       headerTitle: '',
@@ -156,7 +157,7 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
       //   { text: 'Choose from Library', onPress: pickImage },
       // ]);
       pickImage()
-   
+
     }
   };
 
@@ -192,28 +193,20 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
             </View>
 
 
-            : <Image
+            : (groupChat?.avatarFileId ? <Image
               style={styles.avatar}
               source={
-                groupChat?.avatarFileId
-                  ? { uri: `https://api.${apiRegion}.amity.co/api/v3/files/${groupChat?.avatarFileId}/download` }
-                  : require('../../../assets/icon/Placeholder.png')
-              }
-            />}
+                { uri: `https://api.${apiRegion}.amity.co/api/v3/files/${groupChat?.avatarFileId}/download` }
 
-          {/* <Image
-            style={styles.avatar}
-            source={
-              imageMultipleUri.length>0
-                ? { uri: imageMultipleUri[0] }
-                : require('../../../assets/icon/Placeholder.png')
-            }
-          /> */}
+              }
+            /> : <AvatarIcon />)}
+
+   
         </TouchableOpacity>
         <View style={imageMultipleUri[0] ? styles.uploadedCameraIconContainer : styles.cameraIconContainer}>
           <TouchableOpacity onPress={handleAvatarPress}>
             <View style={styles.cameraIcon}>
-             <CameraIcon width={16} height={16}/>
+              <CameraIcon width={16} height={16} />
             </View>
           </TouchableOpacity>
         </View>
@@ -235,7 +228,7 @@ export const EditChatRoomDetail: React.FC<EditChatDetailProps> = ({
         placeholder="Enter your display name"
         placeholderTextColor="#a0a0a0"
       />
-       
+
     </View>
   );
 };
