@@ -6,7 +6,7 @@ import { View, TouchableHighlight, Image } from 'react-native';
 
 import { ChannelRepository } from '@amityco/ts-sdk-react-native';
 import CustomText from '../CustomText';
-import styles from './styles';
+import { useStyles } from './styles';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useAuth from '../../hooks/useAuth';
@@ -45,7 +45,8 @@ const ChatList: React.FC<IChatListProps> = ({
     useState<Amity.Membership<'channel'>[]>();
   const [groupChatObject, setGroupChatObject] =
     useState<Amity.Membership<'channel'>[]>();
-
+  const styles = useStyles();
+  
   const handlePress = (
     channelId: string,
     channelType: string,
@@ -115,7 +116,7 @@ const ChatList: React.FC<IChatListProps> = ({
     >
       <View style={styles.chatCard}>
         <View style={styles.avatarSection}>
-      
+
 
           {avatarFileId ? <Image
             style={styles.icon}

@@ -12,7 +12,7 @@ import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
 
-import styles from './styles';
+import { useStyles } from './styles';
 import CustomText from '../../components/CustomText';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -28,7 +28,7 @@ export default function RecentChat() {
   const [channelObjects, setChannelObjects] = useState<IChatListProps[]>([]);
   const [loadChannel, setLoadChannel] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState(false)
-
+  const styles = useStyles()
 
   const flatListRef = useRef(null);
 
@@ -55,26 +55,26 @@ export default function RecentChat() {
 
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
-useEffect(() => {
-  navigation.setOptions({
+  useEffect(() => {
+    navigation.setOptions({
 
-    header: () => (
-      <View style={styles.topBar}>
-        <CustomText style={styles.titleText}>Chat</CustomText>
-        <TouchableOpacity
-          onPress={() => {
-            setIsModalVisible(true)
-          }}
-        >
-        <AddChatIcon/>
-        </TouchableOpacity>
-      </View>
-    ),
-    headerTitle: '',
-  });
+      header: () => (
+        <View style={styles.topBar}>
+          <CustomText style={styles.titleText}>Chat</CustomText>
+          <TouchableOpacity
+            onPress={() => {
+              setIsModalVisible(true)
+            }}
+          >
+            <AddChatIcon />
+          </TouchableOpacity>
+        </View>
+      ),
+      headerTitle: '',
+    });
 
 
-}, [])
+  }, [])
 
 
 
@@ -84,7 +84,7 @@ useEffect(() => {
       (value) => {
         setChannelData(value);
         subscribeChannels(channels);
-        if(value.data.length === 0){
+        if (value.data.length === 0) {
           setLoadChannel(false);
         }
       },
@@ -195,7 +195,7 @@ useEffect(() => {
         <LoadingIndicator />
       </View>
     ) : (
-      <View style={{flex: 1}}>
+      <View style={{ flex: 1 }}>
         <FlatList
           data={channelObjects}
           renderItem={({ item }) => renderChatList(item)}
@@ -205,7 +205,7 @@ useEffect(() => {
           ref={flatListRef}
           contentContainerStyle={{ flex: 1 }}
         />
-  
+
       </View>
     );
   }, [loadChannel, channelObjects, handleLoadMore]);
@@ -235,9 +235,9 @@ useEffect(() => {
 
   return (
     <View style={styles.chatContainer}>
-     {renderTabView()}
+      {renderTabView()}
       {renderRecentChat}
-      <AddMembersModal onFinish={handleOnFinish} onClose={handleCloseModal} visible={isModalVisible} /> 
+      <AddMembersModal onFinish={handleOnFinish} onClose={handleCloseModal} visible={isModalVisible} />
     </View>
   );
 }
