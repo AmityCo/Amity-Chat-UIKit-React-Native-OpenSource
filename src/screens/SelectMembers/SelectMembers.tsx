@@ -4,7 +4,7 @@ import {
   TouchableOpacity,
   View,
   Text,
-  ListRenderItemInfo,
+  type ListRenderItemInfo,
   TextInput,
   FlatList,
 } from 'react-native';

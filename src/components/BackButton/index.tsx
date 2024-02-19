@@ -1,14 +1,16 @@
 import React from 'react';
 import { TouchableOpacity } from 'react-native';
-import { styles } from './styles';
 
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Image } from 'react-native';
+import { BackIcon } from '../../svg/BackIcon';
+import { useTheme } from 'react-native-paper';
+import type { MyMD3Theme } from '../../providers/amity-ui-kit-provider';
 interface IBackBtn {
-  onPress: () => any;
+  onPress?: () => any;
 }
 export default function BackButton({ onPress }: IBackBtn) {
+  const theme = useTheme() as MyMD3Theme;
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   return (
     <TouchableOpacity
@@ -17,10 +19,7 @@ export default function BackButton({ onPress }: IBackBtn) {
         onPress && onPress();
       }}
     >
-      <Image
-        style={styles.icon}
-        source={require('../../../assets/icon/BackIcon.png')}
-      />
+      <BackIcon color={theme.colors.base} />
     </TouchableOpacity>
   );
 }

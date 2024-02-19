@@ -3,15 +3,17 @@ import {
   TouchableOpacity,
   View,
   Text,
-  GestureResponderEvent,
+  type GestureResponderEvent,
 } from 'react-native';
-import { styles } from './styles';
+import { useStyles } from './styles';
 export default function DoneButton({
   onDonePressed,
 }: {
   navigation: any;
   onDonePressed: { (event: GestureResponderEvent): void };
 }) {
+
+  const styles = useStyles();
   return (
     <TouchableOpacity onPress={onDonePressed}>
       <View style={styles.icon}>

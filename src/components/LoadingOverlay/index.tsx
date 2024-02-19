@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Text, View } from 'react-native';
-import { styles } from './styles';
+import { useStyles } from './styles';
 
 interface LoadingOverlayProps {
   isLoading: boolean;
@@ -11,6 +11,8 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({
   isLoading,
   loadingText,
 }) => {
+
+  const styles = useStyles()
   if (!isLoading) {
     return null;
   }

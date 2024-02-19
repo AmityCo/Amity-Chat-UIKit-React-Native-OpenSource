@@ -6,15 +6,14 @@ import { View, TouchableHighlight, Image } from 'react-native';
 
 import { ChannelRepository } from '@amityco/ts-sdk-react-native';
 import CustomText from '../CustomText';
-import styles from './styles';
+import { useStyles } from './styles';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import type { UserInterface } from '../../types/user.interface';
-import { SvgXml } from 'react-native-svg';
-import { communityChatIcon, privateChatIcon } from '../../svg/svg-xml-list';
-
+import { CommunityChatIcon } from '../../svg/CommunityChatIcon';
+import { PrivateChatIcon } from '../../svg/PrivateChatIcon';
 export interface IChatListProps {
   chatId: string;
   chatName: string;
@@ -46,6 +45,7 @@ const ChatList: React.FC<IChatListProps> = ({
     useState<Amity.Membership<'channel'>[]>();
   const [groupChatObject, setGroupChatObject] =
     useState<Amity.Membership<'channel'>[]>();
+  const styles = useStyles();
 
   const handlePress = (
     channelId: string,
@@ -110,14 +110,14 @@ const ChatList: React.FC<IChatListProps> = ({
   }, [groupChatObject]);
 
   return (
-    // <View>
-    //   <Text>{chatName}</Text>
-    // </View>
+
     <TouchableHighlight
       onPress={() => handlePress(chatId, channelType, chatMemberNumber)}
     >
       <View style={styles.chatCard}>
         <View style={styles.avatarSection}>
+
+
           {avatarFileId ? <Image
             style={styles.icon}
             source={
@@ -126,7 +126,8 @@ const ChatList: React.FC<IChatListProps> = ({
               }
             }
           /> : <View style={styles.icon}>
-            {channelType === 'community' ? <SvgXml xml={communityChatIcon} width={24} height={24} /> : <SvgXml xml={privateChatIcon} width={24} height={24} />}
+            {channelType === 'community' ? <CommunityChatIcon />
+              : <PrivateChatIcon />}
 
           </View>}
 

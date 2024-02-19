@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { View, Image, Text, ActivityIndicator, StyleProp, ImageStyle } from 'react-native';
+import { View, Image, Text, ActivityIndicator, type StyleProp, type ImageStyle } from 'react-native';
 import * as Progress from 'react-native-progress';
 import {
   uploadImageFile,
@@ -41,13 +41,15 @@ const LoadingImage = ({
   }, [progress]);
 
   const uploadFileToAmity = useCallback(async () => {
-    if (!isFinish) {
+
+    if (!isFinish ) {
       const file: Amity.File<any>[] = await uploadImageFile(
         source,
         (percent: number) => {
           setProgress(percent);
           console.log('percent:', percent)
-        }
+        },
+        true
 
       );
       if (file) {
@@ -78,7 +80,7 @@ const LoadingImage = ({
         <Image
           source={{ uri: source }}
           style={[
-            containerStyle?containerStyle:styles.image,
+            containerStyle ? containerStyle : styles.image,
             loading ? styles.loadingImage : styles.loadedImage,
           ]}
         />

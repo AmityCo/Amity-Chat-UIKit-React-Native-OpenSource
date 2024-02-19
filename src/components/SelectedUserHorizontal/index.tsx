@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { Image, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { styles } from './styles';
+import { useStyles } from './styles';
 import type { UserInterface } from '../../types/user.interface';
 import useAuth from '../../hooks/useAuth';
+import { AvatarIcon } from '../../svg/AvatarIcon';
 
 const maxLength = 10;
 const displayName = (user: UserInterface) => {
@@ -21,6 +22,8 @@ const AvatarListItem = ({
   user: UserInterface;
   onDelete: () => void;
 }) => {
+
+  const styles = useStyles();
   const { apiRegion } = useAuth()
   const avatarFileURL = (fileId: string) => {
     return `https://api.${apiRegion}.amity.co/api/v3/files/${fileId}/download?size=medium`;
@@ -29,14 +32,13 @@ const AvatarListItem = ({
     <View style={styles.avatarContainer}>
       <View style={styles.avatar}>
         <View style={styles.avatarImageContainer}>
-          <Image
+          {user.avatarFileId ? <Image
             style={styles.avatarImage}
             source={
-              user.avatarFileId
-                ? { uri: avatarFileURL(user.avatarFileId) }
-                : require('../../../assets/icon/Placeholder.png')
-            }
-          />
+              { uri: avatarFileURL(user.avatarFileId) }
+
+            } /> : <AvatarIcon />}
+
         </View>
         <TouchableOpacity onPress={onDelete} style={styles.deleteButton}>
           <Text style={styles.deleteButtonText}>✕</Text>
@@ -54,6 +56,7 @@ export default function SelectedUserHorizontal({
   users: UserInterface[];
   onDeleteUserPressed: (user: UserInterface) => void;
 }) {
+  const styles = useStyles();
   const [scrollOffset, setScrollOffset] = useState(0);
   const scrollViewRef = useRef<ScrollView>(null);
 

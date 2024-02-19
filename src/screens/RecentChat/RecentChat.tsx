@@ -1,20 +1,18 @@
-import React, { ReactElement, useMemo, useRef } from 'react';
+import React, { type ReactElement, useMemo, useRef } from 'react';
 
 import {
   View,
   FlatList,
   TouchableOpacity,
-  Image,
-  SafeAreaView,
 } from 'react-native';
 
 import { ChannelRepository, getChannelTopic, subscribeTopic } from '@amityco/ts-sdk-react-native';
-import ChatList, { IChatListProps, IGroupChatObject } from '../../components/ChatList/index';
+import ChatList,  { type IChatListProps, type IGroupChatObject } from '../../components/ChatList/index';
 import useAuth from '../../hooks/useAuth';
 import { useEffect, useState } from 'react';
 import moment from 'moment';
 
-import styles from './styles';
+import { useStyles } from './styles';
 import CustomText from '../../components/CustomText';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -22,14 +20,17 @@ import LoadingIndicator from '../../components/LoadingIndicator/index';
 import AddMembersModal from '../../components/AddMembersModal';
 import type { UserInterface } from '../../types/user.interface';
 import { createAmityChannel } from '../../providers/channel-provider';
+import { AddChatIcon } from '../../svg/AddChat';
+import { useTheme } from 'react-native-paper';
+import type { MyMD3Theme } from '../../providers/amity-ui-kit-provider';
 
 export default function RecentChat() {
   const { client, isConnected } = useAuth();
-
+  const theme = useTheme() as MyMD3Theme;
   const [channelObjects, setChannelObjects] = useState<IChatListProps[]>([]);
   const [loadChannel, setLoadChannel] = useState<boolean>(true);
   const [isModalVisible, setIsModalVisible] = useState(false)
-
+  const styles = useStyles()
 
   const flatListRef = useRef(null);
 
@@ -56,35 +57,36 @@ export default function RecentChat() {
 
 
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
+  useEffect(() => {
+    navigation.setOptions({
 
-  navigation.setOptions({
+      header: () => (
+        <View style={styles.topBar}>
+          <CustomText style={styles.titleText}>Chat</CustomText>
+          <TouchableOpacity
+            onPress={() => {
+              setIsModalVisible(true)
+            }}
+          >
+            <AddChatIcon color={theme.colors.base} />
+          </TouchableOpacity>
+        </View>
+      ),
+      headerTitle: '',
+    });
 
-    header: () => (
-      <SafeAreaView style={styles.topBar}>
-        <CustomText style={styles.titleText}>Chat</CustomText>
-        <TouchableOpacity
-          onPress={() => {
-            setIsModalVisible(true)
-          }}
-        >
-          <Image
-            style={styles.addChatIcon}
-            source={require('../../../assets/icon/addChat.png')}
-          />
-        </TouchableOpacity>
-      </SafeAreaView>
-    ),
-    headerTitle: '',
-  });
+
+  }, [])
+
 
 
   const onQueryChannel = () => {
     const unsubscribe = ChannelRepository.getChannels(
-      { sortBy: 'lastActivity', limit: 10, membership: 'member' },
+      { sortBy: 'lastActivity', limit: 15, membership: 'member' },
       (value) => {
         setChannelData(value);
         subscribeChannels(channels);
-        if(value.data.length === 0){
+        if (value.data.length === 0) {
           setLoadChannel(false);
         }
       },
@@ -173,8 +175,6 @@ export default function RecentChat() {
             memberCount: channel.memberCount as number,
             avatarFileId: channel.avatarFileId
           };
-          console.log('groupChatObject: ', groupChatObject);
-
 
           navigation.navigate('ChatRoom', {
             channelId: channel.channelId,
@@ -197,16 +197,16 @@ export default function RecentChat() {
         <LoadingIndicator />
       </View>
     ) : (
-      <View>
+      <View style={styles.chatListContainer}>
         <FlatList
           data={channelObjects}
           renderItem={({ item }) => renderChatList(item)}
           keyExtractor={(item) => item.chatId.toString()}
           onEndReached={handleLoadMore}
-          onEndReachedThreshold={0.3}
+          onEndReachedThreshold={0.4}
           ref={flatListRef}
-          contentContainerStyle={{ flexGrow: 1 }}
         />
+
       </View>
     );
   }, [loadChannel, channelObjects, handleLoadMore]);
@@ -226,7 +226,7 @@ export default function RecentChat() {
   };
   const renderTabView = (): ReactElement => {
     return (
-      <View style={[styles.tabView]}>
+      <View style={styles.tabView}>
         <View style={styles.indicator}>
           <CustomText style={styles.tabViewTitle}>Recent</CustomText>
         </View>

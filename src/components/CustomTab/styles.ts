@@ -1,32 +1,39 @@
 import { StyleSheet } from 'react-native';
+import { useTheme } from 'react-native-paper';
+import type { MyMD3Theme } from '../../providers/amity-ui-kit-provider';
 
-export const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#EBECEF',
-  },
-  activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: '#333',
-  },
-  tabText: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: '#333',
-    marginHorizontal: 15,
-    textAlign: 'center',
-  },
-  activeTabText: {
-    color: '#1054DE',
-  },
-  indicator: {
-    position: 'absolute',
-    bottom: 0,
-    height: 2,
-    backgroundColor: '#1054DE',
-  },
-});
+export const useStyles = () => {
+  const theme = useTheme() as MyMD3Theme;
+  const styles = StyleSheet.create({
+    container: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: 50,
+      backgroundColor: theme.colors.background,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.colors.border,
+    },
+    activeTab: {
+      borderBottomWidth: 2,
+      borderBottomColor: theme.colors.baseShade3,
+    },
+    tabText: {
+      fontSize: 17,
+      fontWeight: 'bold',
+      color: theme.colors.baseShade3,
+      marginHorizontal: 15,
+      textAlign: 'center',
+    },
+    activeTabText: {
+      color: theme.colors.primary,
+    },
+    indicator: {
+      position: 'absolute',
+      bottom: 0,
+      height: 2,
+      backgroundColor:  theme.colors.primary,
+    },
+  });
+  return styles;
+}
+
