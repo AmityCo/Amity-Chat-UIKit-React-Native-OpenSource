@@ -47,8 +47,13 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
     );
   }, []);
 
+  const startSync = async () => {
+    await Client.enableUnreadCount();
+
+  }
   useEffect(() => {
     if (sessionState === 'established') {
+      startSync();
       setIsConnected(true);
     }
   }, [sessionState]);
@@ -90,6 +95,7 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
   }, [userId]);
 
   // TODO
+
   const logout = async () => {
     try {
       Client.stopUnreadSync();

@@ -50,7 +50,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@amityco/react-native-chat-ui-kit@workspace:."
   dependencies:
-    "@amityco/ts-sdk-react-native": ^6.17.3
+    "@amityco/ts-sdk-react-native": ^6.19.0
     "@commitlint/config-conventional": ^17.0.2
     "@evilmartians/lefthook": ^1.5.0
     "@react-native/eslint-config": ^0.72.2
@@ -100,9 +100,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@amityco/ts-sdk-react-native@npm:^6.17.3":
-  version: 6.17.3
-  resolution: "@amityco/ts-sdk-react-native@npm:6.17.3"
+"@amityco/ts-sdk-react-native@npm:^6.19.0":
+  version: 6.19.0
+  resolution: "@amityco/ts-sdk-react-native@npm:6.19.0"
   dependencies:
     "@react-native-async-storage/async-storage": ^1.17.7
     "@react-native-community/netinfo": ^9.4.1
@@ -119,7 +119,7 @@ __metadata:
     ts-jest: ^28.0.3
   peerDependencies:
     react-native: ^0.70.13
-  checksum: 0aad0a9e17540bc1bf3ade9facabacdaab455ca86eb9267f9a88fb25b20503a2a9f077d30c9c9abc42de03324873609d36566b3e919d8a55fd2f405beed4dc79
+  checksum: fed6ef94f03f3409f450f0b8580299de5787fd825b2936c1e67c353edb10989478b99b0aa442e40ee466f690d2eeac6e66e4b95af8059ccce2dd48f822cb41a1
   languageName: node
   linkType: hard
 
@@ -3348,13 +3348,13 @@ __metadata:
   linkType: hard
 
 "@react-native-async-storage/async-storage@npm:^1.17.7":
-  version: 1.21.0
-  resolution: "@react-native-async-storage/async-storage@npm:1.21.0"
+  version: 1.22.3
+  resolution: "@react-native-async-storage/async-storage@npm:1.22.3"
   dependencies:
     merge-options: ^3.0.4
   peerDependencies:
     react-native: ^0.0.0-0 || >=0.60 <1.0
-  checksum: 969cdeb444a037087b1897553082e148e25c8331055dd0dc142f76deeb4aadd9ed5ec26926ae990b3e9ff088396e74ab557148a2dd2a7db86058051b774f2619
+  checksum: bbf0f49c4441361d24f5c7a236862757d1addb7332d4c11ed7238b7023e882d2280290059602d9099cee094f60aeb11aad3f2017652ab6e143544e61dccadb73
   languageName: node
   linkType: hard
 
@@ -7927,14 +7927,14 @@ __metadata:
   linkType: hard
 
 "duplexify@npm:^4.1.1":
-  version: 4.1.2
-  resolution: "duplexify@npm:4.1.2"
+  version: 4.1.3
+  resolution: "duplexify@npm:4.1.3"
   dependencies:
     end-of-stream: ^1.4.1
     inherits: ^2.0.3
     readable-stream: ^3.1.1
-    stream-shift: ^1.0.0
-  checksum: 964376c61c0e92f6ed0694b3ba97c84f199413dc40ab8dfdaef80b7a7f4982fcabf796214e28ed614a5bc1ec45488a29b81e7d46fa3f5ddf65bcb118c20145ad
+    stream-shift: ^1.0.2
+  checksum: 9636a027345de3dd3c801594d01a7c73d9ce260019538beb1ee650bba7544e72f40a4d4902b52e1ab283dc32a06f210d42748773af02ff15e3064a9659deab7f
   languageName: node
   linkType: hard
 
@@ -10126,9 +10126,9 @@ __metadata:
   linkType: hard
 
 "hls.js@npm:^1.4.10":
-  version: 1.5.4
-  resolution: "hls.js@npm:1.5.4"
-  checksum: a29eb8cab16bb328a554b1d1cbfea22c676dc68f0366ef504d3b117ed4eaf3df39ca0a5145dbcb0c2207fd865457a1d6102963976cceb6b0232d601c3ed9b9c5
+  version: 1.5.7
+  resolution: "hls.js@npm:1.5.7"
+  checksum: 2591fbcdb247c06806154974b8957b78f841b33ca3b0823ea30773d554c6f13ccdf6da3c24c764fbed898dfdd54234769ebd868a5b98196671a4852c77f06e2c
   languageName: node
   linkType: hard
 
@@ -12023,9 +12023,9 @@ __metadata:
   linkType: hard
 
 "js-base64@npm:^3.7.2":
-  version: 3.7.6
-  resolution: "js-base64@npm:3.7.6"
-  checksum: 4e1e82443c22f3f8f24902b071ea824069a28a16a86c3d8706e8c0741cace92cfb4affd093f52d13981369e10df840e54df8d0a59ede6dd2204a1f0aa4b64deb
+  version: 3.7.7
+  resolution: "js-base64@npm:3.7.7"
+  checksum: d1b02971db9dc0fd35baecfaf6ba499731fb44fe3373e7e1d6681fbd3ba665f29e8d9d17910254ef8104e2cb8b44117fe4202d3dc54c7cafe9ba300fe5433358
   languageName: node
   linkType: hard
 
@@ -17236,7 +17236,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stream-shift@npm:^1.0.0":
+"stream-shift@npm:^1.0.2":
   version: 1.0.3
   resolution: "stream-shift@npm:1.0.3"
   checksum: a24c0a3f66a8f9024bd1d579a533a53be283b4475d4e6b4b3211b964031447bdf6532dd1f3c2b0ad66752554391b7c62bd7ca4559193381f766534e723d50242
