@@ -47,8 +47,8 @@ export const AuthContextProvider: FC<IAmityUIkitProvider> = ({
     );
   }, []);
 
-  const startSync = async () => {
-    await Client.enableUnreadCount();
+  const startSync =  () => {
+     Client.enableUnreadCount();
 
   }
   useEffect(() => {
