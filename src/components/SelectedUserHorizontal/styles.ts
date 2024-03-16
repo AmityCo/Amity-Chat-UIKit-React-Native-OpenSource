@@ -10,7 +10,6 @@ export const useStyles = () => {
             flexGrow: 1,
             paddingLeft: 10,
             paddingTop: 12,
-            paddingBottom: 16,
             alignItems: 'center',
             backgroundColor: theme.colors.background,
         },
@@ -55,7 +54,7 @@ export const useStyles = () => {
             color: theme.colors.base
         },
         selectedUser: {
-            height: 260
+            height: 150
         }
 
     })
