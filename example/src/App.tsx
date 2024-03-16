@@ -1,9 +1,5 @@
 import * as React from 'react';
-
-import {
-  AmityUiKitProvider,
-  AmityUiKitChat,
-} from '@amityco/react-native-chat-ui-kit';
+import { AmityUiKitProvider, AmityUiKitChat } from '@amityco/react-native-chat-ui-kit';
 
 export default function App() {
 
