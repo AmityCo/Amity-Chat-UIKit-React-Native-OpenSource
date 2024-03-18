@@ -40,7 +40,7 @@ npm run example android or yarn example android
 ### Installation
 Here are the steps to install ui-kit together with another React Native project.
 ```sh
-1. git clone git@github.com:AmityCo/Amity-Chat-UIKit-React-Native-OpenSource.git
+1. git clone https://github.com/AmityCo/Amity-Chat-UIKit-React-Native-OpenSource.git
 2. cd Amity-Chat-UIKit-React-Native-OpenSource
 3. yarn or npm install
 4. npm pack
