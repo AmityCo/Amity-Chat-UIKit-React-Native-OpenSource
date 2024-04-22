@@ -235,10 +235,9 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
         text: inputMessage,
       },
     };
-
+    setInputMessage('');
     const { data: message } = await MessageRepository.createMessage(textMessage);
     if (message) {
-      setInputMessage('');
       scrollToBottom();
     }
   };
