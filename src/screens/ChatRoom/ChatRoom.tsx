@@ -114,69 +114,6 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   const [editMessageText, setEditMessageText] = useState<string>('');
   const disposers: Amity.Unsubscriber[] = [];
 
-  useEffect(() => {
-
-    navigation.setOptions({
-      header: () => (
-        <SafeAreaView style={styles.topBarContainer} edges={['top']}>
-          <View style={styles.topBar}>
-            <View style={styles.chatTitleWrap}>
-              <TouchableOpacity onPress={handleBack}>
-                <BackButton onPress={handleBack} />
-              </TouchableOpacity>
-
-              {chatReceiver ? (
-                chatReceiver?.avatarFileId ?
-                  <Image
-                    style={styles.avatar}
-                    source={
-                      {
-                        uri: `https://api.${apiRegion}.amity.co/api/v3/files/${chatReceiver?.avatarFileId}/download`,
-                      }
-
-                    }
-                  /> : <View style={styles.avatar}>
-                    <AvatarIcon />
-                  </View>
-              ) : groupChat?.avatarFileId ? (
-                <Image
-                  style={styles.avatar}
-                  source={{
-                    uri: `https://api.${apiRegion}.amity.co/api/v3/files/${groupChat?.avatarFileId}/download`,
-                  }}
-                />
-              ) : (
-                <View style={styles.icon}>
-                  <GroupChatIcon />
-                </View>
-              )}
-              <View>
-                <CustomText style={styles.chatName} numberOfLines={1}>
-                  {chatReceiver
-                    ? chatReceiver?.displayName
-                    : groupChat?.displayName}
-                </CustomText>
-                {groupChat && (
-                  <CustomText style={styles.chatMember}>
-                    {groupChat?.memberCount} members
-                  </CustomText>
-                )}
-              </View>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                navigation.navigate('ChatDetail', { channelId: channelId, channelType: chatReceiver ? 'conversation' : 'community', chatReceiver: chatReceiver ?? undefined, groupChat: groupChat ?? undefined });
-              }}
-            >
-              <MenuIcon color={theme.colors.base} />
-            </TouchableOpacity>
-          </View>
-        </SafeAreaView>
-      ),
-      headerTitle: '',
-    });
-
-  }, [])
 
   const subscribeSubChannel = (subChannel: Amity.SubChannel) =>
     disposers.push(subscribeTopic(getSubChannelTopic(subChannel)));
@@ -197,6 +134,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     }
   }, [channelId]);
 
+
   const startRead = async () => {
     await SubChannelRepository.startReading(channelId);
 
@@ -204,6 +142,10 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
   const stopRead = async () => {
     await SubChannelRepository.stopReading(channelId);
 
+  };
+  const markReadMessage = (message: Amity.Message) => {
+    // Mark a message as read
+    message.markRead();
   };
   useEffect(() => {
     if (subChannelData && channelId) {
@@ -222,6 +164,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
   useEffect(() => {
     if (messagesArr.length > 0) {
+      markReadMessage(messagesArr[messagesArr.length - 1] as Amity.Message)
       const formattedMessages = messagesArr.map((item) => {
         const targetIndex: number | undefined =
           groupChat &&
@@ -634,6 +577,60 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
 
     <View style={styles.container}>
+      <SafeAreaView style={styles.topBarContainer} edges={['top']}>
+        <View style={styles.topBar}>
+          <View style={styles.chatTitleWrap}>
+            <TouchableOpacity onPress={handleBack}>
+              <BackButton onPress={handleBack} />
+            </TouchableOpacity>
+
+            {chatReceiver ? (
+              chatReceiver?.avatarFileId ?
+                <Image
+                  style={styles.avatar}
+                  source={
+                    {
+                      uri: `https://api.${apiRegion}.amity.co/api/v3/files/${chatReceiver?.avatarFileId}/download`,
+                    }
+
+                  }
+                /> : <View style={styles.avatar}>
+                  <AvatarIcon />
+                </View>
+            ) : groupChat?.avatarFileId ? (
+              <Image
+                style={styles.avatar}
+                source={{
+                  uri: `https://api.${apiRegion}.amity.co/api/v3/files/${groupChat?.avatarFileId}/download`,
+                }}
+              />
+            ) : (
+              <View style={styles.icon}>
+                <GroupChatIcon />
+              </View>
+            )}
+            <View>
+              <CustomText style={styles.chatName} numberOfLines={1}>
+                {chatReceiver
+                  ? chatReceiver?.displayName
+                  : groupChat?.displayName}
+              </CustomText>
+              {groupChat && (
+                <CustomText style={styles.chatMember}>
+                  {groupChat?.memberCount} members
+                </CustomText>
+              )}
+            </View>
+          </View>
+          <TouchableOpacity
+            onPress={() => {
+              navigation.navigate('ChatDetail', { channelId: channelId, channelType: chatReceiver ? 'conversation' : 'community', chatReceiver: chatReceiver ?? undefined, groupChat: groupChat ?? undefined });
+            }}
+          >
+            <MenuIcon color={theme.colors.base} />
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
       <View style={styles.chatContainer}>
         <FlatList
           data={sortedMessages}
@@ -650,7 +647,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
 
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.select({ ios: 110, android: 100 })}
+        // keyboardVerticalOffset={Platform.select({ ios: 110, android: 100 })}
         style={styles.AllInputWrap}
       >
         <View style={styles.InputWrap}>

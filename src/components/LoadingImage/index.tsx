@@ -42,14 +42,14 @@ const LoadingImage = ({
 
   const uploadFileToAmity = useCallback(async () => {
 
-    if (!isFinish ) {
+    if (!isFinish) {
       const file: Amity.File<any>[] = await uploadImageFile(
         source,
         (percent: number) => {
           setProgress(percent);
-          console.log('percent:', percent)
+
         },
-        true
+        false
 
       );
       if (file) {

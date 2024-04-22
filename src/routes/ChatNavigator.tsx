@@ -42,7 +42,7 @@ export default function ChatNavigator() {
 
         <Stack.Screen
           name="ChatRoom"
-          //  options={{ headerShown: false }}
+          options={{ headerShown: false }}
           component={ChatRoom}
         />
         <Stack.Screen
