@@ -19,6 +19,9 @@ import { CircleCloseIcon } from '../../svg/CircleCloseIcon';
 import { BackIcon } from '../../svg/BackIcon';
 import { useTheme } from 'react-native-paper';
 import type { MyMD3Theme } from '../../providers/amity-ui-kit-provider';
+import MemberActionModal from '../../components/MemberActionModal/MemberActionModal';
+import useAuth from '../../hooks/useAuth';
+import { useChannelPermission } from '../../hooks/useChannelPermission';
 
 export type SelectUserList = {
   title: string;
@@ -28,13 +31,19 @@ export type SelectUserList = {
 export default function MemberDetail({ route, navigation }: any) {
 
   const styles = useStyles();
+  const { client } = useAuth()
   const { channelID } = route.params;
+  const permission = useChannelPermission(channelID)
   const [sectionedUserList, setSectionedUserList] = useState<UserInterface[]>([]);
 
   const [usersObject, setUsersObject] = useState<Amity.LiveCollection<Amity.Membership<"channel">>>();
   const [searchTerm, setSearchTerm] = useState('');
   const [tabIndex, setTabIndex] = useState<number>(1)
-  const { data: userArr = [], onNextPage } = usersObject ?? {};
+  const [actionModalVisible, setActionModalVisible] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<UserInterface>()
+  const [isSelectedUserModerator, setIsSelectedUserModerator] = useState<boolean>(false)
+  let { data: userArr = [], onNextPage } = usersObject ?? {};
+
 
   const theme = useTheme() as MyMD3Theme;
 
@@ -85,21 +94,28 @@ export default function MemberDetail({ route, navigation }: any) {
       queryAccounts('', ['channel-moderator'])
     }
 
-  }, [searchTerm, tabIndex])
+  }, [tabIndex, searchTerm])
 
 
 
   const onUserPressed = (user: UserInterface) => {
-    console.log('user:', user)
+    setSelectedUser(user);
+    setActionModalVisible(true)
+    const index = userArr.findIndex(item => item.userId === user.userId);
+    if (userArr[index]?.roles.includes('channel-moderator')) {
+      setIsSelectedUserModerator(true)
+    } else {
+      setIsSelectedUserModerator(false)
+    }
+
 
   };
-
 
   const renderItem = ({ item }: ListRenderItemInfo<UserInterface>) => {
 
     const userObj: UserInterface = { userId: item.userId, displayName: item.displayName as string, avatarFileId: item.avatarFileId as string }
     return (
-      <UserItem showThreeDot={true} user={userObj} onThreeDotTap={onUserPressed} />
+      <UserItem showThreeDot={true} isUserAccount={(client as Amity.Client).userId === userObj.userId ? true : false} user={userObj} onThreeDotTap={onUserPressed} />
     );
   };
 
@@ -118,7 +134,9 @@ export default function MemberDetail({ route, navigation }: any) {
   const handleTabChange = (index: number) => {
     setTabIndex(index)
 
+
   }
+
   return (
 
     <View style={styles.container}>
@@ -133,7 +151,7 @@ export default function MemberDetail({ route, navigation }: any) {
       <CustomTab tabName={['Members', 'Moderators']} onTabChange={handleTabChange} />
       <View style={styles.inputWrap}>
         <TouchableOpacity onPress={() => queryAccounts(searchTerm)}>
-          <SearchIcon color={theme.colors.base}/>
+          <SearchIcon color={theme.colors.base} />
         </TouchableOpacity>
         <TextInput
           style={styles.input}
@@ -141,7 +159,7 @@ export default function MemberDetail({ route, navigation }: any) {
           onChangeText={handleChange}
         />
         <TouchableOpacity onPress={clearButton}>
-          <CircleCloseIcon color={theme.colors.base}/>
+          <CircleCloseIcon color={theme.colors.base} />
         </TouchableOpacity>
       </View>
 
@@ -152,6 +170,15 @@ export default function MemberDetail({ route, navigation }: any) {
         onEndReachedThreshold={0.5}
         keyExtractor={(item) => item.userId}
 
+      />
+      <MemberActionModal
+        isVisible={actionModalVisible}
+        setIsVisible={setActionModalVisible}
+        userId={selectedUser?.userId as string}
+        channelId={channelID}
+        hasModeratorPermission={permission}
+        isInModeratorTab={tabIndex === 2}
+        isChannelModerator={isSelectedUserModerator}
       />
     </View>
 

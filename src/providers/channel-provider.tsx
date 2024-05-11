@@ -10,7 +10,7 @@ import { Alert } from 'react-native';
 export async function createAmityChannel(
   currentUserID: string,
   users: UserInterface[]
-): Promise<Amity.Channel> {
+): Promise<Amity.InternalChannel<any>> {
   return await new Promise(async (resolve, reject) => {
     if (users.length < 1) {
       return reject(new Error('Insufficient member count'));

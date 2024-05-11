@@ -7,11 +7,13 @@ export const useStyles = () => {
     const theme = useTheme() as MyMD3Theme;
     const styles = StyleSheet.create({
         container: {
+            flex: 1,
             flexGrow: 1,
             paddingLeft: 10,
             paddingTop: 12,
             alignItems: 'center',
             backgroundColor: theme.colors.background,
+            height: 100
         },
         avatarContainer: {
             marginRight: 10,
@@ -54,8 +56,10 @@ export const useStyles = () => {
             color: theme.colors.base
         },
         selectedUser: {
-            height: 150
-        }
+            // height: 150
+            paddingBottom: 30
+        },
+
 
     })
     return styles;

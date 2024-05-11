@@ -15,12 +15,14 @@ export default function UserItem({
   showThreeDot,
   onPress,
   onThreeDotTap,
+  isUserAccount
 }: {
   user: UserInterface;
   isCheckmark?: boolean | undefined;
   showThreeDot?: boolean | undefined;
   onPress?: (user: UserInterface) => void;
   onThreeDotTap?: (user: UserInterface) => void;
+  isUserAccount?: boolean
 }) {
 
   const theme = useTheme() as MyMD3Theme;
@@ -65,10 +67,12 @@ export default function UserItem({
         }
         <Text style={styles.itemText}>{displayName()}</Text>
       </View>
-      {!showThreeDot ? (
+      {!isUserAccount && !showThreeDot ? (
         <RoundCheckbox isChecked={isCheckmark ?? false} />
       ) : (
+        !isUserAccount &&
         <TouchableOpacity
+          style={styles.threedotsBtn}
           onPress={() => {
             if (onThreeDotTap) {
               onThreeDotTap(user);

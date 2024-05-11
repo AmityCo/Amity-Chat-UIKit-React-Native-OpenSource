@@ -21,6 +21,7 @@ import { SearchIcon } from '../../svg/SearchIcon';
 import { CircleCloseIcon } from '../../svg/CircleCloseIcon';
 import { useTheme } from 'react-native-paper';
 import type { MyMD3Theme } from '../../providers/amity-ui-kit-provider';
+import useAuth from '../../hooks/useAuth';
 interface IModal {
   visible: boolean;
   userId?: string;
@@ -34,12 +35,13 @@ export type SelectUserList = {
 };
 const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IModal) => {
   const theme = useTheme() as MyMD3Theme;
-  const styles =useStyles();
+  const styles = useStyles();
   const [sectionedUserList, setSectionedUserList] = useState<UserInterface[]>(initUserList);
   const [selectedUserList, setSelectedUserList] = useState<UserInterface[]>(initUserList);
   const [usersObject, setUsersObject] = useState<Amity.LiveCollection<Amity.User>>();
   const [searchTerm, setSearchTerm] = useState('');
   const [isShowSectionHeader, setIsShowSectionHeader] = useState<boolean>(false)
+  const { client } = useAuth()
   const { data: userArr = [], onNextPage } = usersObject ?? {};
 
 
@@ -128,10 +130,9 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
 
 
     return (
-      <View>
+      <View style={styles.sectionItem}>
         {isrenderheader && <SectionHeader title={currentLetter} />}
-
-        <UserItem showThreeDot={false} user={userObj} isCheckmark={selectedUser} onPress={onUserPressed} />
+        <UserItem isUserAccount={(client as Amity.Client).userId === userObj.userId ? true : false} showThreeDot={false} user={userObj} isCheckmark={selectedUser} onPress={onUserPressed} />
       </View>
 
     );
@@ -187,9 +188,9 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
             <Text style={[selectedUserList.length > 0 ? styles.doneText : styles.disabledDone]}>Done</Text>
           </TouchableOpacity>
         </View>
-      <View style={styles.inputWrap}>
+        <View style={styles.inputWrap}>
           <TouchableOpacity onPress={() => queryAccounts(searchTerm)}>
-          <SearchIcon color={theme.colors.base}/>
+            <SearchIcon color={theme.colors.base} />
           </TouchableOpacity>
           <TextInput
             style={styles.input}
@@ -197,7 +198,7 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
             onChangeText={handleChange}
           />
           <TouchableOpacity onPress={clearButton}>
-           <CircleCloseIcon color={theme.colors.base}/>
+            <CircleCloseIcon color={theme.colors.base} />
           </TouchableOpacity>
         </View>
         {selectedUserList.length > 0 ? (
@@ -219,7 +220,7 @@ const AddMembersModal = ({ visible, onClose, onFinish, initUserList = [] }: IMod
           ref={flatListRef}
           onScroll={handleScroll}
         />
-      </View> 
+      </View>
     </Modal>
   );
 };
