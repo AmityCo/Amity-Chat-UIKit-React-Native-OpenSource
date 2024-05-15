@@ -78,6 +78,10 @@ export const useStyles = () => {
     disabledDone: {
       opacity: 0.5
     },
+    sectionItem: {
+     flex: 1
+    }
+
   });
   return styles;
 }

@@ -7,7 +7,6 @@ import * as React from 'react';
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import SelectMembers from '../screens/SelectMembers/SelectMembers';
 
 import type { RootStackParamList } from './RouteParamList';
 import { ChatRoomSetting } from '../screens/ChatDetail/ChatRoomSetting';
@@ -68,18 +67,6 @@ export default function ChatNavigator() {
             title: 'Edit Chat Detail',
           }}
         />
-
-        <Stack.Group screenOptions={{ presentation: 'modal' }}>
-          <Stack.Screen
-            name="SelectMembers"
-            component={SelectMembers}
-            options={({ }) => ({
-              title: '',
-              headerShown: false
-
-            })}
-          />
-        </Stack.Group>
       </Stack.Navigator>}
 
     </NavigationContainer>

@@ -59,7 +59,6 @@ export default function RecentChat() {
   const navigation = useNavigation<NativeStackNavigationProp<any>>();
   useEffect(() => {
     navigation.setOptions({
-
       header: () => (
         <View style={styles.topBar}>
           <CustomText style={styles.titleText}>Chat</CustomText>
@@ -74,7 +73,6 @@ export default function RecentChat() {
       ),
       headerTitle: '',
     });
-
 
   }, [])
 
@@ -191,6 +189,7 @@ export default function RecentChat() {
 
     }
   }
+
   const renderRecentChat = useMemo(() => {
     return loadChannel ? (
       <View style={{ marginTop: 20 }}>
@@ -210,6 +209,7 @@ export default function RecentChat() {
       </View>
     );
   }, [loadChannel, channelObjects, handleLoadMore]);
+
   const renderChatList = (item: IChatListProps): ReactElement => {
     return (
       <ChatList

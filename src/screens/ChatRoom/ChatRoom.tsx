@@ -52,6 +52,7 @@ import { SendChatIcon } from '../../svg/SendChatIcon';
 import { AlbumIcon } from '../../svg/AlbumIcon';
 import { useTheme } from 'react-native-paper';
 import type { MyMD3Theme } from '../../providers/amity-ui-kit-provider';
+import { getAmityUser } from '../../providers/user-provider';
 
 type ChatRoomScreenComponentType = React.FC<{
   route: RouteProp<RootStackParamList, 'ChatRoom'>;
@@ -143,10 +144,10 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     await SubChannelRepository.stopReading(channelId);
 
   };
-  const markReadMessage = (message: Amity.Message) => {
-    // Mark a message as read
-    message.markRead();
-  };
+  const getUserInfo = async (userId: string) => {
+    const user = await getAmityUser(userId)
+    return user
+  }
   useEffect(() => {
     if (subChannelData && channelId) {
       startRead()
@@ -162,65 +163,57 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
     }
   }, [subChannelData]);
 
-  useEffect(() => {
+  const chatFormatter = async () => {
     if (messagesArr.length > 0) {
-      markReadMessage(messagesArr[messagesArr.length - 1] as Amity.Message)
-      const formattedMessages = messagesArr.map((item) => {
-        const targetIndex: number | undefined =
-          groupChat &&
-          groupChat.users?.findIndex(
-            (groupChatItem) => item.creatorId === groupChatItem.userId
-          );
-        let avatarUrl = '';
-        if (
-          groupChat &&
-          targetIndex &&
-          (groupChat?.users as any)[targetIndex as number]?.avatarFileId
-        ) {
-          avatarUrl = `https://api.${apiRegion}.amity.co/api/v3/files/${(groupChat?.users as any)[targetIndex as number]
-            ?.avatarFileId as any
-            }/download`;
-        } else if (chatReceiver && chatReceiver.avatarFileId) {
-          avatarUrl = `https://api.${apiRegion}.amity.co/api/v3/files/${chatReceiver.avatarFileId}/download`;
-        }
+      const formattedMessages = await Promise.all(
+        messagesArr.map(async (item) => {
 
-        if ((item?.data as Record<string, any>)?.fileId) {
-          return {
-            _id: item.messageId,
-            text: '',
-            image:
-              `https://api.${apiRegion}.amity.co/api/v3/files/${(item?.data as Record<string, any>).fileId
-              }/download` ?? undefined,
-            createdAt: item.createdAt as string,
-            editedAt: item.updatedAt as string,
-            user: {
-              _id: item.creatorId ?? '',
-              name: item.creatorId ?? '',
-              avatar: avatarUrl,
-            },
-            messageType: item.dataType,
-            isDeleted: item.isDeleted as boolean
-          };
-        } else {
-          return {
-            _id: item.messageId,
-            text:
-              ((item?.data as Record<string, string>)?.text as string) ?? '',
-            createdAt: item.createdAt as string,
-            editedAt: item.updatedAt as string,
-            user: {
-              _id: item.creatorId ?? '',
-              name: item.creatorId ?? '',
-              avatar: avatarUrl,
-            },
-            messageType: item.dataType,
-            isDeleted: item.isDeleted as boolean
-          };
-        }
-      });
+          if ((item?.data as Record<string, any>)?.fileId) {
+            const { userObject } = await getUserInfo(item.creatorId);
+            return {
+              _id: item.messageId,
+              text: '',
+              image:
+                `https://api.${apiRegion}.amity.co/api/v3/files/${(item?.data as Record<string, any>).fileId
+                }/download` ?? undefined,
+              createdAt: item.createdAt as string,
+              editedAt: item.updatedAt as string,
+              user: {
+                _id: userObject.data.userId ?? '',
+                name: userObject.data.displayName ?? '',
+                avatar: userObject.data.avatar.fileUrl,
+              },
+              messageType: item.dataType,
+              isDeleted: item.isDeleted as boolean
+            };
+          } else {
+            const { userObject } = await getUserInfo(item.creatorId);
+
+            return {
+              _id: item.messageId,
+              text:
+                ((item?.data as Record<string, string>)?.text as string) ?? '',
+              createdAt: item.createdAt as string,
+              editedAt: item.updatedAt as string,
+              user: {
+                _id: userObject.data.userId ?? '',
+                name: userObject.data.displayName ?? '',
+                avatar: userObject.data.avatar.fileUrl,
+              },
+              messageType: item.dataType,
+              isDeleted: item.isDeleted as boolean
+            };
+          }
+        })
+      );
       setMessages(formattedMessages);
     }
+  };
+
+  useEffect(() => {
+    chatFormatter();
   }, [messagesArr]);
+
 
   const handleSend = async () => {
     if (inputMessage.trim() === '') {

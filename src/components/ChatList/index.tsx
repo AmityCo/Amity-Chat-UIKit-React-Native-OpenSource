@@ -43,7 +43,11 @@ const ChatList: React.FC<IChatListProps> = ({
   const { client, apiRegion } = useAuth();
   const [oneOnOneChatObject, setOneOnOneChatObject] = useState<Amity.Membership<'channel'>[]>();
   const [groupChatObject, setGroupChatObject] = useState<Amity.Membership<'channel'>[]>();
+  const [channelAvatarFileId, setChannelAvatarFileId] = useState<string | undefined>(avatarFileId)
+  const [channelDisplayName, setChannelDisplayName] = useState<string>(chatName)
+
   const styles = useStyles();
+
 
   const handlePress = (
     chatMemberNumber: number
@@ -101,6 +105,16 @@ const ChatList: React.FC<IChatListProps> = ({
     );
   }, [])
 
+  useEffect(() => {
+    if (oneOnOneChatObject) {
+      const targetIndex: number = oneOnOneChatObject?.findIndex(
+        (item) => item.userId !== (client as Amity.Client).userId
+      );
+      setChannelAvatarFileId(oneOnOneChatObject[targetIndex]?.user?.avatarFileId ?? avatarFileId)
+      setChannelDisplayName(oneOnOneChatObject[targetIndex]?.user?.displayName as string)
+    }
+  }, [oneOnOneChatObject])
+
 
   return (
 
@@ -111,11 +125,11 @@ const ChatList: React.FC<IChatListProps> = ({
         <View style={styles.avatarSection}>
 
 
-          {avatarFileId ? <Image
+          {channelAvatarFileId ? <Image
             style={styles.icon}
             source={
               {
-                uri: `https://api.${apiRegion}.amity.co/api/v3/files/${avatarFileId}/download?size=small`,
+                uri: `https://api.${apiRegion}.amity.co/api/v3/files/${channelAvatarFileId}/download?size=small`,
               }
             }
           /> : <View style={styles.icon}>
@@ -129,7 +143,7 @@ const ChatList: React.FC<IChatListProps> = ({
         <View style={styles.chatDetailSection}>
           <View style={styles.chatNameWrap}>
             <CustomText style={styles.chatName} numberOfLines={1}>
-              {chatName}
+              {channelDisplayName}
             </CustomText>
             <CustomText style={styles.chatLightText}>
               ({chatMemberNumber})

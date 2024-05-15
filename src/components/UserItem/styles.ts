@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import type { MyMD3Theme } from '../../providers/amity-ui-kit-provider';
 
-export const useStyles =()=>{
+export const useStyles = () => {
     const theme = useTheme() as MyMD3Theme;
     const styles = StyleSheet.create({
         listItem: {
@@ -29,9 +29,12 @@ export const useStyles =()=>{
         },
         dotIcon: {
             width: 16,
-            height: 12
+            height: 12,
+        },
+        threedotsBtn:{
+            padding: 5,
         }
-    
+
     })
     return styles;
 }
