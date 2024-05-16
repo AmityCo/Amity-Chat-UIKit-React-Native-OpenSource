@@ -181,7 +181,7 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               user: {
                 _id: userObject.data.userId ?? '',
                 name: userObject.data.displayName ?? '',
-                avatar: userObject.data.avatar.fileUrl,
+                avatar: userObject?.data?.avatar?.fileUrl ?? '',
               },
               messageType: item.dataType,
               isDeleted: item.isDeleted as boolean
@@ -197,8 +197,8 @@ const ChatRoom: ChatRoomScreenComponentType = ({ route }) => {
               editedAt: item.updatedAt as string,
               user: {
                 _id: userObject.data.userId ?? '',
-                name: userObject.data.displayName ?? '',
-                avatar: userObject.data.avatar.fileUrl,
+                name: userObject?.data?.displayName ?? '',
+                avatar: userObject?.data?.avatar?.fileUrl ?? '',
               },
               messageType: item.dataType,
               isDeleted: item.isDeleted as boolean
